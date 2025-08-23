@@ -141,7 +141,7 @@ button[type='submit'] {
   font-weight: 700;
   margin-top: 10px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background-color 0.2s;
   box-shadow: 0 2px 8px rgba(209, 16, 51, 0.08);
   &:hover {
     background: $form-btn-hover;

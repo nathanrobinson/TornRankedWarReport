@@ -155,7 +155,7 @@ button {
   font-weight: 600;
   margin-bottom: 18px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background-color 0.2s;
   box-shadow: 0 2px 8px rgba(209, 16, 51, 0.08);
   &:hover {
     background: color.adjust($accent, $lightness: 10%);
@@ -193,7 +193,9 @@ td {
 }
 
 tbody tr {
-  transition: background 0.2s;
+  transition:
+    background-color 0.2s ease-in,
+    color 0.2s ease-in;
 }
 
 tbody tr:nth-child(even) {
@@ -217,7 +219,7 @@ th.sortable {
   cursor: pointer;
   user-select: none;
   position: relative;
-  transition: background 0.15s;
+  transition: background-color 0.15s;
   &:hover,
   &.sorted {
     background: color.adjust($primary, $lightness: 10%);
@@ -225,7 +227,7 @@ th.sortable {
   span {
     margin-left: 6px;
     font-size: 0.95em;
-    color: color.adjust($accent, $lightness: 35%);
+    color: color.adjust($accent, $lightness: 25%);
     vertical-align: middle;
   }
 }
