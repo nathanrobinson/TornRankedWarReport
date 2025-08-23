@@ -1,0 +1,16 @@
+# GitHub Copilot configuration for this repository
+
+# Instruct Copilot to prefer TypeScript, Vue 3, and SASS/SCSS for UI.
+# Encourage clean, professional, and accessible code.
+# Use red and green complementary color palettes for UI suggestions.
+# Avoid inline styles; use SASS/SCSS modules or <style lang="scss"> blocks.
+# Prefer composition API for Vue components.
+# Use concise, descriptive variable and function names.
+# Write code that is easy to maintain and extend.
+# Add comments for complex logic.
+# Do not suggest code that violates Torn API ToS or leaks API keys.
+# Avoid generating test data that looks like real user credentials.
+# Use async/await for asynchronous operations.
+# Prefer functional and composable patterns.
+# Use modern JavaScript/TypeScript best practices.
+# Do not suggest code that is harmful, hateful, or offensive.
