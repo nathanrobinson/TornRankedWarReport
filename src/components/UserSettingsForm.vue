@@ -39,19 +39,19 @@ function handleSubmit() {
   <form @submit.prevent="handleSubmit">
     <div>
       <label for="apiKey">Torn Limited API Key:</label>
-      <input id="apiKey" v-model="apiKey" type="text" required />
+      <input id="apiKey" v-model="apiKey" type="password" required />
     </div>
     <div>
       <label for="attackRewards">Attack Rewards:</label>
-      <input id="attackRewards" v-model="attackRewards" type="text" inputmode="decimal" required />
+      <input id="attackRewards" v-model="attackRewards" type="text" inputmode="decimal" />
     </div>
     <div>
       <label for="assistRewards">Assist Rewards:</label>
-      <input id="assistRewards" v-model="assistRewards" type="text" inputmode="decimal" required />
+      <input id="assistRewards" v-model="assistRewards" type="text" inputmode="decimal" />
     </div>
     <div>
       <label for="medOutRewards">Med Out Rewards:</label>
-      <input id="medOutRewards" v-model="medOutRewards" type="text" inputmode="decimal" required />
+      <input id="medOutRewards" v-model="medOutRewards" type="text" inputmode="decimal" />
     </div>
     <div>
       <label>Payout Type:</label>
@@ -106,6 +106,7 @@ label {
 }
 
 input[type='text'],
+input[type='password'],
 select {
   width: 100%;
   box-sizing: border-box;
