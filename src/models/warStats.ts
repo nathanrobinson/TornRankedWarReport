@@ -10,4 +10,6 @@ export interface WarStats {
   rewardPerAssist: number
   totalMedOuts: number
   rewardPerMedOut: number
+  totalRevives: number
+  rewardPerRevive: number
 }

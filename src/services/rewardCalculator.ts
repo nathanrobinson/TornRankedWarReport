@@ -33,9 +33,11 @@ async function getWarReport(apiKey: string) {
   const opponentId = opponent?.id
 
   let playerDefends: { [playerId: number]: number } = {}
+  let playerRevives: { [playerId: number]: number } = {}
 
   if (factionId && opponentId) {
     playerDefends = await tornApi.getLosses(factionId, opponentId, start, end)
+    playerRevives = await tornApi.getRevives(factionId, start, end)
   }
 
   const totalAttacks = lastWarReport.attacks
@@ -52,6 +54,11 @@ async function getWarReport(apiKey: string) {
     totalDefends += playerDefends[pid] ?? 0
   }
 
+  let totalRevives = 0
+  for (const pid in playerRevives) {
+    totalRevives += playerRevives[pid] ?? 0
+  }
+
   return {
     id: factionWarReport.rankedWar.rankedwarreport.id,
     opponent: opponent?.name,
@@ -59,10 +66,12 @@ async function getWarReport(apiKey: string) {
     totalRespect,
     totalAssists,
     totalDefends,
+    totalRevives,
     bonusRespect,
     playerChainReports,
     lastWarReport,
     playerDefends,
+    playerRevives,
   }
 }
 
@@ -89,10 +98,12 @@ export async function calculateRewards(settings: RewardSettings): Promise<
     totalRespect: warReport.totalRespect,
     totalAssists: warReport.totalAssists,
     totalMedOuts: warReport.totalDefends,
-    rewardPerRespect: settings.attackRewards / calculatedRespect,
+    totalRevives: warReport.totalRevives,
+    rewardPerRespect: settings.attackRewards / (calculatedRespect || 1),
     rewardPerAttack: settings.attackRewards / (warReport.totalAttacks || 1),
     rewardPerAssist: settings.assistRewards / (warReport.totalAssists || 1),
     rewardPerMedOut: settings.medOutRewards / (warReport.totalDefends || 1),
+    rewardPerRevive: settings.reviveRewards / (warReport.totalRevives || 1),
   }
 
   const userStats = warReport.lastWarReport.members
@@ -101,6 +112,7 @@ export async function calculateRewards(settings: RewardSettings): Promise<
       const playerBonus = warReport.playerChainReports[user.id]?.bonus
       const playerAssists = warReport.playerChainReports[user.id]?.assists
       const playerMedOuts = warReport.playerDefends[user.id] ?? 0
+      const playerRevives = warReport.playerRevives[user.id] ?? 0
 
       if (settings.payoutType === 'perRespect' && settings.ignoreChainBonus && playerBonus > 10) {
         playerRespect -= Math.min(playerBonus - 10, 0)
@@ -112,7 +124,8 @@ export async function calculateRewards(settings: RewardSettings): Promise<
 
       const rewardAssists = playerAssists * warStats.rewardPerAssist
       const rewardMedOuts = playerMedOuts * warStats.rewardPerMedOut
-      const totalRewards = rewardAttackRespect + rewardAssists + rewardMedOuts
+      const rewardRevives = playerRevives * warStats.rewardPerRevive
+      const totalRewards = rewardAttackRespect + rewardAssists + rewardMedOuts + rewardRevives
 
       // Helper to blank 0/NaN
       const blank = (val: number | undefined | null) => (!val || isNaN(val) ? 0 : val)
@@ -125,15 +138,23 @@ export async function calculateRewards(settings: RewardSettings): Promise<
         bonusRespect: blank(playerBonus),
         assists: blank(playerAssists),
         medOuts: blank(playerMedOuts),
+        revives: blank(playerRevives),
         rewardAttackRespect: blank(rewardAttackRespect),
         rewardAssists: blank(rewardAssists),
         rewardMedOuts: blank(rewardMedOuts),
+        rewardRevives: blank(rewardRevives),
         totalRewards: blank(totalRewards),
       }
     })
     // Filter out users with no rewards (0 or NaN for all reward fields)
     .filter((u) =>
-      [u.rewardAttackRespect, u.rewardAssists, u.rewardMedOuts, u.totalRewards].some((val) => val),
+      [
+        u.rewardAttackRespect,
+        u.rewardAssists,
+        u.rewardMedOuts,
+        u.rewardRevives,
+        u.totalRewards,
+      ].some((val) => val),
     )
 
   return {

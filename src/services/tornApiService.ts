@@ -59,6 +59,48 @@ export class TornApi {
     return chain?.chainreport
   }
 
+  async getRevives(
+    factionId: number,
+    start: number,
+    end: number,
+  ): Promise<{ [playerId: number]: number }> {
+    const playerRevives: { [playerId: number]: number } = {}
+
+    const query: { [key: string]: string | number } = {
+      filters: 'incoming',
+      limit: 1000,
+      sort: 'ASC',
+      from: start,
+      striptags: 'true',
+    }
+
+    if (end > start) {
+      query.end = end
+    }
+
+    let revives: ReviveLog | null = await this.#fetch<ReviveLog>('faction/revivesFull', query)
+
+    while (revives?.revives?.length) {
+      for (const revive of revives?.revives) {
+        if (revive.reviver?.faction_id === factionId && revive.target?.faction_id === factionId) {
+          if (!playerRevives[revive.reviver.id]) {
+            playerRevives[revive.reviver.id] = 1
+          } else {
+            playerRevives[revive.reviver.id]++
+          }
+        }
+      }
+
+      if (revives._metadata?.links?.next) {
+        revives = await this.#fetch<ReviveLog>(revives._metadata.links.next)
+      } else {
+        revives = null
+      }
+    }
+
+    return playerRevives
+  }
+
   async getLosses(
     defender: number,
     attacker: number,
@@ -336,6 +378,33 @@ interface AttackLog {
     result: string
     respect_gain: number
     respect_loss: number
+  }[]
+  _metadata: {
+    links: {
+      next: string
+      prev: string
+    }
+  }
+}
+
+interface ReviveLog {
+  revives: {
+    id: number
+    reviver: {
+      id: number
+      faction_id: number
+    }
+    target: {
+      id: number
+      faction_id: number
+      hospital_reason: string
+      early_discharge: boolean
+      last_action: number
+      online_status: string
+    }
+    success_chance: number
+    result: string
+    timestamp: number
   }[]
   _metadata: {
     links: {

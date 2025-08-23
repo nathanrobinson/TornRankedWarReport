@@ -6,8 +6,10 @@ export interface UserStats {
   bonusRespect: number
   assists: number
   medOuts: number
+  revives: number
   rewardAttackRespect: number
   rewardAssists: number
   rewardMedOuts: number
+  rewardRevives: number
   totalRewards: number
 }

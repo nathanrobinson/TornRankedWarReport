@@ -38,34 +38,36 @@ function formatCurrency(val: number | null | undefined): string {
     <div>
       <span>Total Number of Attacks:</span>
       <span class="primary">{{ warStats?.totalAttacks }}</span>
-    </div>
-    <div v-if="warStats?.rewardPerAttack !== null">
-      <span>Reward per Attack:</span>
-      <span class="primary">{{ formatCurrency(warStats?.rewardPerAttack) }}</span>
+      <span v-if="warStats?.rewardPerAttack !== null">$/:</span>
+      <span class="primary" v-if="warStats?.rewardPerAttack !== null">{{
+        formatCurrency(warStats?.rewardPerAttack)
+      }}</span>
     </div>
     <div>
       <span>Total Respect Earned:</span>
       <span class="primary">{{ warStats?.totalRespect }}</span>
-    </div>
-    <div v-if="warStats?.rewardPerRespect !== null">
-      <span>Reward per Respect:</span>
-      <span class="primary">{{ formatCurrency(warStats?.rewardPerRespect) }}</span>
+      <span v-if="warStats?.rewardPerRespect !== null">$/:</span>
+      <span class="primary" v-if="warStats?.rewardPerRespect !== null">{{
+        formatCurrency(warStats?.rewardPerRespect)
+      }}</span>
     </div>
     <div>
       <span>Total Number of Assists:</span>
       <span class="primary">{{ warStats?.totalAssists }}</span>
-    </div>
-    <div>
-      <span>Reward per Assist:</span>
+      <span>$/:</span>
       <span class="primary">{{ formatCurrency(warStats?.rewardPerAssist) }}</span>
     </div>
     <div>
       <span>Total Number of Med Outs:</span>
       <span class="primary">{{ warStats?.totalMedOuts }}</span>
+      <span>$/:</span>
+      <span class="primary">{{ formatCurrency(warStats?.rewardPerMedOut) }}</span>
     </div>
     <div>
-      <span>Reward per Med Out:</span>
-      <span class="primary">{{ formatCurrency(warStats?.rewardPerMedOut) }}</span>
+      <span>Total Number of Revives:</span>
+      <span class="primary">{{ warStats?.totalRevives }}</span>
+      <span>$/:</span>
+      <span class="primary">{{ formatCurrency(warStats?.rewardPerRevive) }}</span>
     </div>
   </div>
 </template>
@@ -81,7 +83,8 @@ $card-value: #222;
 $link-color: $primary;
 $link-hover: $accent;
 
-div {
+div,
+form {
   background: $card-bg;
   border: 2px solid $card-border;
   border-radius: 12px;
@@ -97,7 +100,7 @@ h2 {
   color: $card-title;
   font-size: 2rem;
   font-weight: 800;
-  margin-bottom: 18px;
+  margin: 12px 0 18px 12px;
   letter-spacing: 0.03em;
   word-break: break-word;
 }

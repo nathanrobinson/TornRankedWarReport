@@ -6,6 +6,7 @@ const apiKey = ref('')
 const attackRewards = ref('')
 const assistRewards = ref('')
 const medOutRewards = ref('')
+const reviveRewards = ref('') // Add revive rewards
 
 // Add payoutType and ignoreChainBonus
 const payoutType = ref<'perAttack' | 'perRespect'>('perRespect')
@@ -29,6 +30,7 @@ function handleSubmit() {
     attackRewards: parseNumber(attackRewards.value),
     assistRewards: parseNumber(assistRewards.value),
     medOutRewards: parseNumber(medOutRewards.value),
+    reviveRewards: parseNumber(reviveRewards.value), // Add revive rewards
     payoutType: payoutType.value,
     ignoreChainBonus: ignoreChainBonusEnabled.value ? ignoreChainBonus.value : false,
   })
@@ -54,6 +56,10 @@ function handleSubmit() {
       <input id="medOutRewards" v-model="medOutRewards" type="text" inputmode="decimal" />
     </div>
     <div>
+      <label for="reviveRewards">Revive Rewards:</label>
+      <input id="reviveRewards" v-model="reviveRewards" type="text" inputmode="decimal" />
+    </div>
+    <div>
       <label>Payout Type:</label>
       <select v-model="payoutType">
         <option value="perAttack">Per Attack</option>
@@ -63,7 +69,7 @@ function handleSubmit() {
     <div>
       <label>
         <input type="checkbox" v-model="ignoreChainBonus" :disabled="!ignoreChainBonusEnabled" />
-        Ignore Chain Bonus
+        Exclude Chain Bonus
       </label>
     </div>
     <button type="submit">Submit</button>

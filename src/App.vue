@@ -4,20 +4,14 @@ import UserSettingsForm from './components/UserSettingsForm.vue'
 import WarStatsSummary from './components/WarStatsSummary.vue'
 import UserStatsTable from './components/UserStatsTable.vue'
 import { calculateRewards } from '@/services/rewardCalculator'
+import type { RewardSettings } from '@/models/rewardSettings'
 import type { WarStats } from '@/models/warStats'
 import type { UserStats } from '@/models/userStats'
 
 const warStats = ref<WarStats | null | undefined>(undefined)
 const userStats = ref<UserStats[]>([])
 
-async function handleUserSettingsSubmit(data: {
-  apiKey: string
-  attackRewards: number
-  assistRewards: number
-  medOutRewards: number
-  payoutType: 'perAttack' | 'perRespect'
-  ignoreChainBonus: boolean
-}) {
+async function handleUserSettingsSubmit(data: RewardSettings) {
   // Handle the submitted data as needed
   console.log('User settings submitted:', data)
   const battleLog = await calculateRewards(data)
@@ -39,7 +33,7 @@ async function handleUserSettingsSubmit(data: {
 </template>
 
 <style scoped lang="scss">
-$app-bg: #dbd4d3;
+$app-bg: #343030;
 
 body,
 #app {
@@ -53,8 +47,7 @@ body,
 .main-flex {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  max-width: 1200px;
+  gap: 24px;
   margin: 0 auto;
   padding: 24px 8px;
 }
@@ -62,7 +55,7 @@ body,
 .side-by-side {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 .table-panel {
@@ -76,17 +69,11 @@ body,
   .side-by-side {
     flex-direction: row;
     align-items: flex-start;
-    gap: 24px;
   }
   .side-by-side > * {
     flex: 1 1 0;
     min-width: 0;
     max-width: 50%;
-  }
-  .table-panel {
-    width: 100%;
-    min-width: 0;
-    flex: 1 1 0;
   }
 }
 </style>

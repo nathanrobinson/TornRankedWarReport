@@ -23,9 +23,11 @@ const columns = [
   { key: 'bonusRespect', label: 'Bonus Respect' },
   { key: 'assists', label: 'Assists' },
   { key: 'medOuts', label: 'Med Outs' },
+  { key: 'revives', label: 'Revives' },
   { key: 'rewardAttackRespect', label: 'Attack/Respect $' },
   { key: 'rewardAssists', label: 'Assist $' },
   { key: 'rewardMedOuts', label: 'Med Out $' },
+  { key: 'rewardRevives', label: 'Revive $' },
   { key: 'totalRewards', label: 'Total $' },
 ]
 
@@ -71,9 +73,11 @@ function exportToCSV() {
     u.bonusRespect,
     u.assists,
     u.medOuts,
+    u.revives,
     formatCurrency(u.rewardAttackRespect),
     formatCurrency(u.rewardAssists),
     formatCurrency(u.rewardMedOuts),
+    formatCurrency(u.rewardRevives),
     formatCurrency(u.totalRewards),
   ])
   const csvContent = [headers, ...rows]
@@ -121,9 +125,11 @@ function exportToCSV() {
           <td>{{ user.bonusRespect }}</td>
           <td>{{ user.assists }}</td>
           <td>{{ user.medOuts }}</td>
+          <td>{{ user.revives }}</td>
           <td>{{ formatCurrency(user.rewardAttackRespect) }}</td>
           <td>{{ formatCurrency(user.rewardAssists) }}</td>
           <td>{{ formatCurrency(user.rewardMedOuts) }}</td>
+          <td>{{ formatCurrency(user.rewardRevives) }}</td>
           <td>{{ formatCurrency(user.totalRewards) }}</td>
         </tr>
       </tbody>
@@ -136,7 +142,7 @@ function exportToCSV() {
 
 $primary: #b5112f;
 $accent: #2d3047;
-$table-header-bg: $primary;
+$table-header-bg: color.adjust($primary, $lightness: 10%);
 $table-header-text: #fff;
 $table-row-even: #fff;
 $table-row-odd: #efeeee;
@@ -144,6 +150,12 @@ $table-border: $accent;
 $table-row-hover-fg: #fff;
 $table-row-hover: color.adjust($accent, $lightness: 25%);
 $table-cell-padding: 8px 12px;
+$sort-indicator-shadow-color: color.adjust($accent, $lightness: -10%);
+$sort-indicator-shadow:
+  -1px -1px 0 $sort-indicator-shadow-color,
+  1px -1px 0 $sort-indicator-shadow-color,
+  -1px 1px 0 $sort-indicator-shadow-color,
+  1px 1px 0 $sort-indicator-shadow-color;
 
 button {
   background: $accent;
@@ -222,13 +234,17 @@ th.sortable {
   transition: background-color 0.15s;
   &:hover,
   &.sorted {
-    background: color.adjust($primary, $lightness: 10%);
+    background: $primary;
   }
   span {
     margin-left: 6px;
-    font-size: 0.95em;
-    color: color.adjust($accent, $lightness: 25%);
+    color: #fff;
+    text-shadow: $sort-indicator-shadow;
+    font-weight: bold;
+    font-size: 1.1em;
     vertical-align: middle;
+    padding: 0 2px;
+    border-radius: 2px;
   }
 }
 </style>
