@@ -138,10 +138,10 @@ $primary: #b5112f;
 $accent: #2d3047;
 $table-header-bg: $primary;
 $table-header-text: #fff;
-$table-row-even: #ffffff;
-$table-row-odd: #e7e7e7;
+$table-row-even: #fff;
+$table-row-odd: #efeeee;
 $table-border: $accent;
-$table-row-hover: color.adjust($primary, $lightness: 90%);
+$table-row-hover: color.adjust($accent, $lightness: 20%);
 $table-cell-padding: 8px 12px;
 
 button {
