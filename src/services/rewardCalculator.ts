@@ -88,7 +88,9 @@ export async function calculateRewards(settings: RewardSettings): Promise<
     return undefined
   }
 
-  const calculatedRespect = Math.max(warReport.totalRespect - warReport.bonusRespect, 0)
+  const calculatedRespect = settings.ignoreChainBonus
+    ? Math.max(warReport.totalRespect - warReport.bonusRespect, 0)
+    : warReport.totalRespect
 
   const warStats: WarStats = {
     rankedWarId: warReport.id,
@@ -99,8 +101,12 @@ export async function calculateRewards(settings: RewardSettings): Promise<
     totalAssists: warReport.totalAssists,
     totalMedOuts: warReport.totalDefends,
     totalRevives: warReport.totalRevives,
-    rewardPerRespect: settings.attackRewards / (calculatedRespect || 1),
-    rewardPerAttack: settings.attackRewards / (warReport.totalAttacks || 1),
+    rewardPerRespect:
+      settings.payoutType === 'perRespect' ? settings.attackRewards / (calculatedRespect || 1) : 0,
+    rewardPerAttack:
+      settings.payoutType === 'perAttack'
+        ? settings.attackRewards / (warReport.totalAttacks || 1)
+        : 0,
     rewardPerAssist: settings.assistRewards / (warReport.totalAssists || 1),
     rewardPerMedOut: settings.medOutRewards / (warReport.totalDefends || 1),
     rewardPerRevive: settings.reviveRewards / (warReport.totalRevives || 1),
@@ -115,7 +121,7 @@ export async function calculateRewards(settings: RewardSettings): Promise<
       const playerRevives = warReport.playerRevives[user.id] ?? 0
 
       if (settings.payoutType === 'perRespect' && settings.ignoreChainBonus && playerBonus > 10) {
-        playerRespect -= Math.min(playerBonus - 10, 0)
+        playerRespect -= Math.max(playerBonus - 10, 0)
       }
       const rewardAttackRespect =
         settings.payoutType === 'perAttack'
