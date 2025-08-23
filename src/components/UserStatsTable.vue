@@ -141,7 +141,8 @@ $table-header-text: #fff;
 $table-row-even: #fff;
 $table-row-odd: #efeeee;
 $table-border: $accent;
-$table-row-hover: color.adjust($accent, $lightness: 20%);
+$table-row-hover-fg: #fff;
+$table-row-hover: color.adjust($accent, $lightness: 25%);
 $table-cell-padding: 8px 12px;
 
 button {
@@ -204,6 +205,7 @@ tbody tr:nth-child(odd) {
 }
 
 tbody tr:hover {
+  color: $table-row-hover-fg;
   background: $table-row-hover;
 }
 
@@ -223,7 +225,7 @@ th.sortable {
   span {
     margin-left: 6px;
     font-size: 0.95em;
-    color: $accent;
+    color: color.adjust($accent, $lightness: 35%);
     vertical-align: middle;
   }
 }
