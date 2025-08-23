@@ -82,6 +82,7 @@ $card-label: $accent;
 $card-value: #222;
 $link-color: $primary;
 $link-hover: $accent;
+$box-shadow-color: color.change($accent, $alpha: 0.08);
 
 div,
 form {
@@ -91,7 +92,7 @@ form {
   padding: 14px 16px 10px 16px;
   max-width: 540px;
   margin: 12px auto 16px auto;
-  box-shadow: 0 2px 16px rgba(45, 48, 71, 0.08);
+  box-shadow: 0 2px 16px $box-shadow-color;
   overflow-x: auto;
   word-break: break-word;
 }
@@ -116,6 +117,9 @@ a {
 }
 
 #warStats > div {
+  color: $card-value;
+  border-color: $primary;
+  font-weight: 500;
   margin-bottom: 10px;
   font-size: 1.08rem;
   display: flex;
@@ -130,12 +134,6 @@ a {
   font-weight: 600;
   min-width: 180px;
   display: inline-block;
-  word-break: break-word;
-}
-
-#warStats > div {
-  color: $card-value;
-  font-weight: 500;
   word-break: break-word;
 }
 

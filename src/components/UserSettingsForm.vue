@@ -84,24 +84,28 @@ $accent: #2d3047;
 $form-bg: #fff;
 $form-border: $accent;
 $form-label: $primary;
-$form-input-bg: #f8f9fa;
+$form-input-bg: #b3959a;
 $form-input-focus: $accent;
 $form-btn-bg: $accent;
 $form-btn-hover: color.adjust($accent, $lightness: 10%);
 $form-btn-text: #fff;
+$form-box-shadow-color: color.change($accent, $alpha: 0.08);
 
 form {
   background: $form-bg;
   border: 2px solid $form-border;
   border-radius: 12px;
-  padding: 32px 28px 24px 28px;
-  max-width: 480px;
-  margin: 32px auto 24px auto;
-  box-shadow: 0 2px 16px rgba(45, 48, 71, 0.08);
   display: flex;
   flex-direction: column;
   gap: 18px;
   overflow: hidden;
+
+  padding: 14px 16px 10px 16px;
+  max-width: 540px;
+  margin: 12px auto 16px auto;
+  box-shadow: 0 2px 16px $form-box-shadow-color;
+  overflow-x: auto;
+  word-break: break-word;
 }
 
 label {
