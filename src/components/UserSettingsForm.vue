@@ -84,7 +84,7 @@ $accent: #2d3047;
 $form-bg: #fff;
 $form-border: $accent;
 $form-label: $primary;
-$form-input-bg: #b3959a;
+$form-input-bg: #fff4f6;
 $form-input-focus: $accent;
 $form-btn-bg: $accent;
 $form-btn-hover: color.adjust($accent, $lightness: 10%);
@@ -155,6 +155,13 @@ button[type='submit'] {
   box-shadow: 0 2px 8px rgba(209, 16, 51, 0.08);
   &:hover {
     background: $form-btn-hover;
+  }
+}
+
+@media (max-width: 899px) {
+  form {
+    max-width: 90vw;
+    width: 90vw;
   }
 }
 </style>

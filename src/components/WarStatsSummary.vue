@@ -86,13 +86,11 @@ $link-color: $primary;
 $link-hover: $accent;
 $box-shadow-color: color.change($accent, $alpha: 0.08);
 
-div,
-form {
+div {
   background: $card-bg;
   border: 2px solid $card-border;
   border-radius: 12px;
   padding: 14px 16px 10px 16px;
-  max-width: 540px;
   margin: 12px auto 16px auto;
   box-shadow: 0 2px 16px $box-shadow-color;
   overflow-x: auto;
@@ -142,5 +140,12 @@ a {
 .primary {
   color: $primary;
   font-weight: 600;
+}
+
+@media (max-width: 899px) {
+  #warStats {
+    max-width: 90vw;
+    width: 90vw;
+  }
 }
 </style>

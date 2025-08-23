@@ -32,18 +32,20 @@ async function handleUserSettingsSubmit(data: RewardSettings) {
   </div>
 </template>
 
-<style scoped lang="scss">
-$app-bg: #343030;
+<style lang="scss">
+$app-bg: #c8c0c2;
 
 body,
 #app {
-  background: $app-bg;
+  background-color: $app-bg;
   min-height: 100vh;
   font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
   padding: 0;
   margin: 0;
 }
+</style>
 
+<style lang="scss" scoped>
 .main-flex {
   display: flex;
   flex-direction: column;
