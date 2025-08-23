@@ -73,6 +73,8 @@ function formatCurrency(val: number | null | undefined): string {
 </template>
 
 <style lang="scss" scoped>
+@use 'sass:color';
+
 $primary: #b5112f;
 $accent: #2d3047;
 $card-bg: #fff;

@@ -121,7 +121,7 @@ select {
   width: 100%;
   box-sizing: border-box;
   padding: 12px 14px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid $primary;
   border-radius: 6px;
   background: $form-input-bg;
   font-size: 1rem;
