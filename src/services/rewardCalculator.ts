@@ -115,8 +115,8 @@ export async function calculateRewards(settings: RewardSettings): Promise<
   const userStats = warReport.lastWarReport.members
     .map((user) => {
       let playerRespect = user.score
-      const playerBonus = warReport.playerChainReports[user.id]?.bonus
-      const playerAssists = warReport.playerChainReports[user.id]?.assists
+      const playerBonus = warReport.playerChainReports[user.id]?.bonus ?? 0
+      const playerAssists = warReport.playerChainReports[user.id]?.assists ?? 0
       const playerMedOuts = warReport.playerDefends[user.id] ?? 0
       const playerRevives = warReport.playerRevives[user.id] ?? 0
 
