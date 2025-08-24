@@ -257,7 +257,7 @@ $form-input-focus: $accent;
 $form-btn-bg: $accent;
 $form-btn-hover: color.adjust($accent, $lightness: 10%);
 $form-btn-text: #fff;
-$form-box-shadow-color: color.change($accent, $alpha: 0.08);
+$form-box-shadow-color: color.adjust($accent, $lightness: -30%);
 
 form {
   background: $form-bg;
@@ -322,7 +322,7 @@ button[type='submit'] {
   margin-top: 10px;
   cursor: pointer;
   transition: background-color 0.2s;
-  box-shadow: 0 2px 8px rgba(209, 16, 51, 0.08);
+  box-shadow: 0 2px 8px $form-box-shadow-color;
   &:hover {
     background: $form-btn-hover;
   }
@@ -348,13 +348,13 @@ button[type='submit'] {
   z-index: 10;
   background: $form-input-bg;
   color: $accent;
-  border: 1.5px solid $primary;
+  border: 1.5px solid $accent;
   border-radius: 8px;
-  padding: 10px 14px;
+  padding: 5px 7px;
   min-width: 220px;
   max-width: 320px;
   font-size: 0.98em;
-  box-shadow: 0 2px 12px rgba(45, 48, 71, 0.13);
+  box-shadow: 0 2px 12px $form-box-shadow-color;
   white-space: normal;
   pointer-events: none;
 }
