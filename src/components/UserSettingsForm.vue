@@ -123,6 +123,7 @@ label {
 
 input[type='text'],
 input[type='password'],
+input[type='number'],
 select {
   width: 100%;
   box-sizing: border-box;

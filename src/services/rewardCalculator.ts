@@ -125,18 +125,22 @@ export async function calculateRewards(settings: RewardSettings): Promise<
       if (settings.payoutType === 'perRespect' && settings.ignoreChainBonus && playerBonus > 10) {
         playerRespect -= Math.min(playerBonus - 10, 0)
       }
-      const rewardAttackRespect =
-        settings.payoutType === 'perAttack'
-          ? user.attacks * (warStats.rewardPerAttack ?? 0)
-          : playerRespect * (warStats.rewardPerRespect ?? 0)
-
-      const rewardAssists = playerAssists * warStats.rewardPerAssist
-      const rewardMedOuts = playerMedOuts * warStats.rewardPerMedOut
-      const rewardRevives = playerRevives * warStats.rewardPerRevive
-      const totalRewards = rewardAttackRespect + rewardAssists + rewardMedOuts + rewardRevives
 
       // Helper to blank 0/NaN
       const blank = (val: number | undefined | null) => (!val || isNaN(val) ? 0 : val)
+
+      const rewardAttackRespect = blank(
+        settings.payoutType === 'perAttack'
+          ? user.attacks * (warStats.rewardPerAttack ?? 0)
+          : playerRespect * (warStats.rewardPerRespect ?? 0),
+      )
+
+      const rewardAssists = blank(playerAssists * warStats.rewardPerAssist)
+      const rewardMedOuts = blank(playerMedOuts * warStats.rewardPerMedOut)
+      const rewardRevives = blank(playerRevives * warStats.rewardPerRevive)
+      const totalRewards = blank(
+        rewardAttackRespect + rewardAssists + rewardMedOuts + rewardRevives,
+      )
 
       return {
         id: user.id,
@@ -147,11 +151,11 @@ export async function calculateRewards(settings: RewardSettings): Promise<
         assists: blank(playerAssists),
         medOuts: blank(playerMedOutsRaw),
         revives: blank(playerRevives),
-        rewardAttackRespect: blank(rewardAttackRespect),
-        rewardAssists: blank(rewardAssists),
-        rewardMedOuts: blank(rewardMedOuts),
-        rewardRevives: blank(rewardRevives),
-        totalRewards: blank(totalRewards),
+        rewardAttackRespect: rewardAttackRespect,
+        rewardAssists: rewardAssists,
+        rewardMedOuts: rewardMedOuts,
+        rewardRevives: rewardRevives,
+        totalRewards: totalRewards,
       }
     })
     // Filter out users with no rewards (0 or NaN for all reward fields)

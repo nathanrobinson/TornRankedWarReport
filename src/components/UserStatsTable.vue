@@ -215,7 +215,6 @@ th {
   padding: $table-cell-padding;
   font-size: 1.1rem;
   font-weight: 700;
-  border-bottom: 3px solid $table-border;
   letter-spacing: 0.03em;
   position: sticky;
   top: 0;
