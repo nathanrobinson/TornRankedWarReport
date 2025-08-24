@@ -6,7 +6,8 @@ const apiKey = ref('')
 const attackRewards = ref('')
 const assistRewards = ref('')
 const medOutRewards = ref('')
-const reviveRewards = ref('') // Add revive rewards
+const reviveRewards = ref('')
+const minMedOuts = ref('10') // Default to 10
 
 // Add payoutType and ignoreChainBonus
 const payoutType = ref<'perAttack' | 'perRespect'>('perRespect')
@@ -30,9 +31,10 @@ function handleSubmit() {
     attackRewards: parseNumber(attackRewards.value),
     assistRewards: parseNumber(assistRewards.value),
     medOutRewards: parseNumber(medOutRewards.value),
-    reviveRewards: parseNumber(reviveRewards.value), // Add revive rewards
+    reviveRewards: parseNumber(reviveRewards.value),
     payoutType: payoutType.value,
     ignoreChainBonus: ignoreChainBonusEnabled.value ? ignoreChainBonus.value : false,
+    minMedOuts: parseNumber(minMedOuts.value),
   })
 }
 </script>
@@ -58,6 +60,10 @@ function handleSubmit() {
     <div>
       <label for="reviveRewards">Revive Rewards:</label>
       <input id="reviveRewards" v-model="reviveRewards" type="text" inputmode="decimal" />
+    </div>
+    <div>
+      <label for="minMedOuts">Minimum Med Outs:</label>
+      <input id="minMedOuts" v-model="minMedOuts" type="number" min="0" />
     </div>
     <div>
       <label>Payout Type:</label>

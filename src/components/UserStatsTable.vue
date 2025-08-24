@@ -97,12 +97,12 @@ function exportToCSV() {
 
 const columnWidths: Record<string, string> = {
   name: '210px',
-  attacks: '90px',
-  respect: '110px',
-  bonusRespect: '110px',
-  assists: '90px',
-  medOuts: '90px',
-  revives: '90px',
+  attacks: '50px',
+  respect: '50px',
+  bonusRespect: '50px',
+  assists: '50px',
+  medOuts: '50px',
+  revives: '50px',
   rewardAttackRespect: '120px',
   rewardAssists: '110px',
   rewardMedOuts: '110px',

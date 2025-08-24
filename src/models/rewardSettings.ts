@@ -6,4 +6,5 @@ export interface RewardSettings {
   reviveRewards: number
   payoutType: 'perAttack' | 'perRespect'
   ignoreChainBonus: boolean
+  minMedOuts: number
 }

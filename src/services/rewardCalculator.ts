@@ -49,11 +49,6 @@ async function getWarReport(apiKey: string) {
     totalAssists += playerChainReports[pid]?.assists ?? 0
   }
 
-  let totalDefends = 0
-  for (const pid in playerDefends) {
-    totalDefends += playerDefends[pid] ?? 0
-  }
-
   let totalRevives = 0
   for (const pid in playerRevives) {
     totalRevives += playerRevives[pid] ?? 0
@@ -65,7 +60,6 @@ async function getWarReport(apiKey: string) {
     totalAttacks,
     totalRespect,
     totalAssists,
-    totalDefends,
     totalRevives,
     bonusRespect,
     playerChainReports,
@@ -88,9 +82,19 @@ export async function calculateRewards(settings: RewardSettings): Promise<
     return undefined
   }
 
-  const calculatedRespect = settings.ignoreChainBonus
-    ? Math.max(warReport.totalRespect - warReport.bonusRespect, 0)
-    : warReport.totalRespect
+  const minMedOuts = settings.minMedOuts ?? 0
+
+  // Only count med outs for users meeting the minimum
+  // Calculate totalMedOuts as the sum of filtered med outs
+  let totalMedOuts = 0
+  for (const pid in warReport.playerDefends) {
+    const count = warReport.playerDefends[pid] ?? 0
+    if (count >= minMedOuts) {
+      totalMedOuts += count
+    }
+  }
+
+  const calculatedRespect = Math.max(warReport.totalRespect - warReport.bonusRespect, 0)
 
   const warStats: WarStats = {
     rankedWarId: warReport.id,
@@ -99,29 +103,27 @@ export async function calculateRewards(settings: RewardSettings): Promise<
     totalAttacks: warReport.totalAttacks,
     totalRespect: warReport.totalRespect,
     totalAssists: warReport.totalAssists,
-    totalMedOuts: warReport.totalDefends,
+    totalMedOuts,
     totalRevives: warReport.totalRevives,
-    rewardPerRespect:
-      settings.payoutType === 'perRespect' ? settings.attackRewards / (calculatedRespect || 1) : 0,
-    rewardPerAttack:
-      settings.payoutType === 'perAttack'
-        ? settings.attackRewards / (warReport.totalAttacks || 1)
-        : 0,
+    rewardPerRespect: settings.attackRewards / (calculatedRespect || 1),
+    rewardPerAttack: settings.attackRewards / (warReport.totalAttacks || 1),
     rewardPerAssist: settings.assistRewards / (warReport.totalAssists || 1),
-    rewardPerMedOut: settings.medOutRewards / (warReport.totalDefends || 1),
+    rewardPerMedOut: settings.medOutRewards / (totalMedOuts || 1),
     rewardPerRevive: settings.reviveRewards / (warReport.totalRevives || 1),
   }
 
   const userStats = warReport.lastWarReport.members
     .map((user) => {
       let playerRespect = user.score
-      const playerBonus = warReport.playerChainReports[user.id]?.bonus ?? 0
-      const playerAssists = warReport.playerChainReports[user.id]?.assists ?? 0
-      const playerMedOuts = warReport.playerDefends[user.id] ?? 0
+      const playerBonus = warReport.playerChainReports[user.id]?.bonus
+      const playerAssists = warReport.playerChainReports[user.id]?.assists
+      const playerMedOutsRaw = warReport.playerDefends[user.id] ?? 0
+      // Only count med outs for users meeting the minimum
+      const playerMedOuts = playerMedOutsRaw >= minMedOuts ? playerMedOutsRaw : 0
       const playerRevives = warReport.playerRevives[user.id] ?? 0
 
       if (settings.payoutType === 'perRespect' && settings.ignoreChainBonus && playerBonus > 10) {
-        playerRespect -= Math.max(playerBonus - 10, 0)
+        playerRespect -= Math.min(playerBonus - 10, 0)
       }
       const rewardAttackRespect =
         settings.payoutType === 'perAttack'
@@ -143,7 +145,7 @@ export async function calculateRewards(settings: RewardSettings): Promise<
         respect: blank(user.score),
         bonusRespect: blank(playerBonus),
         assists: blank(playerAssists),
-        medOuts: blank(playerMedOuts),
+        medOuts: blank(playerMedOutsRaw),
         revives: blank(playerRevives),
         rewardAttackRespect: blank(rewardAttackRespect),
         rewardAssists: blank(rewardAssists),
@@ -153,13 +155,14 @@ export async function calculateRewards(settings: RewardSettings): Promise<
       }
     })
     // Filter out users with no rewards (0 or NaN for all reward fields)
-    .filter(
-      (u) =>
-        u.rewardAttackRespect ||
-        u.rewardAssists ||
-        u.rewardMedOuts ||
-        u.rewardRevives ||
+    .filter((u) =>
+      [
+        u.rewardAttackRespect,
+        u.rewardAssists,
+        u.rewardMedOuts,
+        u.rewardRevives,
         u.totalRewards,
+      ].some((val) => val),
     )
 
   return {
