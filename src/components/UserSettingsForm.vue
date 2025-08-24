@@ -39,65 +39,206 @@ function handleSubmit() {
     minMedOuts: parseNumber(minMedOuts.value),
   })
 }
+
+const helpOpen = ref<string | null>(null)
+
+const helpTexts: Record<string, string> = {
+  apiKey:
+    'Your Torn API key with at least limited access. This is required to fetch war and member data. The key is not saved or transmitted anywhere except to the torn api.',
+  attackRewards:
+    'Total amount of money to distribute for attacks or respect, depending on payout type.',
+  assistRewards: 'Total amount of money to distribute for assists.',
+  medOutRewards: 'Total amount of money to distribute for med outs (hospitalizes).',
+  minMedOuts:
+    'The minimum number of med outs a player must have to be eligible for med out rewards.',
+  reviveRewards: 'Total amount of money to distribute for revives.',
+  chainBuilderRewards:
+    'If set, attacks that build a chain but do not contribute respect will receive a pro-rated reward.',
+  payoutType: 'Choose whether attack rewards are distributed per attack or per respect earned.',
+  ignoreChainBonus:
+    'If checked, attacks with a special chain bonus will be calculated at 10 respect instead of the bonus amount.',
+}
+
+function showHelp(key: string) {
+  helpOpen.value = key
+}
+function hideHelp(key: string) {
+  if (helpOpen.value === key) helpOpen.value = null
+}
 </script>
 
 <template>
   <form @submit.prevent="handleSubmit">
     <div>
-      <label for="apiKey">Torn Limited API Key:</label>
+      <label for="apiKey">
+        Torn Limited API Key:
+        <span
+          class="help-icon"
+          @mouseenter="showHelp('apiKey')"
+          @mouseleave="hideHelp('apiKey')"
+          @click="helpOpen === 'apiKey' ? hideHelp('apiKey') : showHelp('apiKey')"
+          tabindex="0"
+          >&#x1F6C8;</span
+        >
+        <span v-if="helpOpen === 'apiKey'" class="help-popup">{{ helpTexts.apiKey }}</span>
+      </label>
       <input id="apiKey" v-model="apiKey" type="password" required />
     </div>
     <div>
-      <label for="attackRewards">Attack Rewards:</label>
+      <label for="attackRewards">
+        Attack Rewards:
+        <span
+          class="help-icon"
+          @mouseenter="showHelp('attackRewards')"
+          @mouseleave="hideHelp('attackRewards')"
+          @click="
+            helpOpen === 'attackRewards' ? hideHelp('attackRewards') : showHelp('attackRewards')
+          "
+          tabindex="0"
+          >&#x1F6C8;</span
+        >
+        <span v-if="helpOpen === 'attackRewards'" class="help-popup">{{
+          helpTexts.attackRewards
+        }}</span>
+      </label>
       <input id="attackRewards" v-model="attackRewards" type="text" inputmode="decimal" />
     </div>
     <div>
-      <label for="assistRewards">Assist Rewards:</label>
-      <input id="assistRewards" v-model="assistRewards" type="text" inputmode="decimal" />
-    </div>
-    <div>
-      <label for="medOutRewards">Med Out Rewards:</label>
-      <input id="medOutRewards" v-model="medOutRewards" type="text" inputmode="decimal" />
-    </div>
-    <div>
-      <label
-        for="minMedOuts"
-        title="The threshold number of med outs that a player must have before they are included in the payout calculations"
-        >Minimum Med Outs:</label
-      >
-      <input id="minMedOuts" v-model="minMedOuts" type="number" min="0" />
-    </div>
-    <div>
-      <label for="reviveRewards">Revive Rewards:</label>
-      <input id="reviveRewards" v-model="reviveRewards" type="text" inputmode="decimal" />
-    </div>
-    <div>
-      <label
-        for="chainBuilderRewards"
-        title="If a value is entered, then attacks that build a chain but don't contribute respect will be give a pro-rated reward"
-        >Chain Builder Rewards:</label
-      >
-      <input
-        id="chainBuilderRewards"
-        v-model="chainBuilderRewards"
-        type="text"
-        inputmode="decimal"
-      />
-    </div>
-    <div>
-      <label>Payout Type:</label>
+      <label>
+        Payout Type:
+        <span
+          class="help-icon"
+          @mouseenter="showHelp('payoutType')"
+          @mouseleave="hideHelp('payoutType')"
+          @click="helpOpen === 'payoutType' ? hideHelp('payoutType') : showHelp('payoutType')"
+          tabindex="0"
+          >&#x1F6C8;</span
+        >
+        <span v-if="helpOpen === 'payoutType'" class="help-popup">{{ helpTexts.payoutType }}</span>
+      </label>
       <select v-model="payoutType">
         <option value="perAttack">Per Attack</option>
         <option value="perRespect">Per Respect</option>
       </select>
     </div>
     <div>
-      <label
-        title="If selected, then attacks that received a special chain bonus will be calculated at 10 respect instead of the bonus amount"
-      >
+      <label>
         <input type="checkbox" v-model="ignoreChainBonus" :disabled="!ignoreChainBonusEnabled" />
         Exclude Chain Bonus
+        <span
+          class="help-icon"
+          @mouseenter="showHelp('ignoreChainBonus')"
+          @mouseleave="hideHelp('ignoreChainBonus')"
+          @click="
+            helpOpen === 'ignoreChainBonus'
+              ? hideHelp('ignoreChainBonus')
+              : showHelp('ignoreChainBonus')
+          "
+          tabindex="0"
+          >&#x1F6C8;</span
+        >
+        <span v-if="helpOpen === 'ignoreChainBonus'" class="help-popup">{{
+          helpTexts.ignoreChainBonus
+        }}</span>
       </label>
+    </div>
+    <div>
+      <label for="assistRewards">
+        Assist Rewards:
+        <span
+          class="help-icon"
+          @mouseenter="showHelp('assistRewards')"
+          @mouseleave="hideHelp('assistRewards')"
+          @click="
+            helpOpen === 'assistRewards' ? hideHelp('assistRewards') : showHelp('assistRewards')
+          "
+          tabindex="0"
+          >&#x1F6C8;</span
+        >
+        <span v-if="helpOpen === 'assistRewards'" class="help-popup">{{
+          helpTexts.assistRewards
+        }}</span>
+      </label>
+      <input id="assistRewards" v-model="assistRewards" type="text" inputmode="decimal" />
+    </div>
+    <div>
+      <label for="medOutRewards">
+        Med Out Rewards:
+        <span
+          class="help-icon"
+          @mouseenter="showHelp('medOutRewards')"
+          @mouseleave="hideHelp('medOutRewards')"
+          @click="
+            helpOpen === 'medOutRewards' ? hideHelp('medOutRewards') : showHelp('medOutRewards')
+          "
+          tabindex="0"
+          >&#x1F6C8;</span
+        >
+        <span v-if="helpOpen === 'medOutRewards'" class="help-popup">{{
+          helpTexts.medOutRewards
+        }}</span>
+      </label>
+      <input id="medOutRewards" v-model="medOutRewards" type="text" inputmode="decimal" />
+    </div>
+    <div>
+      <label for="minMedOuts">
+        Minimum Med Outs:
+        <span
+          class="help-icon"
+          @mouseenter="showHelp('minMedOuts')"
+          @mouseleave="hideHelp('minMedOuts')"
+          @click="helpOpen === 'minMedOuts' ? hideHelp('minMedOuts') : showHelp('minMedOuts')"
+          tabindex="0"
+          >&#x1F6C8;</span
+        >
+        <span v-if="helpOpen === 'minMedOuts'" class="help-popup">{{ helpTexts.minMedOuts }}</span>
+      </label>
+      <input id="minMedOuts" v-model="minMedOuts" type="number" min="0" />
+    </div>
+    <div>
+      <label for="reviveRewards">
+        Revive Rewards:
+        <span
+          class="help-icon"
+          @mouseenter="showHelp('reviveRewards')"
+          @mouseleave="hideHelp('reviveRewards')"
+          @click="
+            helpOpen === 'reviveRewards' ? hideHelp('reviveRewards') : showHelp('reviveRewards')
+          "
+          tabindex="0"
+          >&#x1F6C8;</span
+        >
+        <span v-if="helpOpen === 'reviveRewards'" class="help-popup">{{
+          helpTexts.reviveRewards
+        }}</span>
+      </label>
+      <input id="reviveRewards" v-model="reviveRewards" type="text" inputmode="decimal" />
+    </div>
+    <div>
+      <label for="chainBuilderRewards">
+        Chain Builder Rewards:
+        <span
+          class="help-icon"
+          @mouseenter="showHelp('chainBuilderRewards')"
+          @mouseleave="hideHelp('chainBuilderRewards')"
+          @click="
+            helpOpen === 'chainBuilderRewards'
+              ? hideHelp('chainBuilderRewards')
+              : showHelp('chainBuilderRewards')
+          "
+          tabindex="0"
+          >&#x1F6C8;</span
+        >
+        <span v-if="helpOpen === 'chainBuilderRewards'" class="help-popup">{{
+          helpTexts.chainBuilderRewards
+        }}</span>
+      </label>
+      <input
+        id="chainBuilderRewards"
+        v-model="chainBuilderRewards"
+        type="text"
+        inputmode="decimal"
+      />
     </div>
     <button type="submit">Submit</button>
   </form>
@@ -136,6 +277,7 @@ form {
 }
 
 label {
+  position: relative;
   color: $form-label;
   font-weight: 600;
   margin-bottom: 6px;
@@ -184,6 +326,36 @@ button[type='submit'] {
   &:hover {
     background: $form-btn-hover;
   }
+}
+
+.help-icon {
+  display: inline-block;
+  margin-left: 6px;
+  color: $primary;
+  cursor: pointer;
+  font-size: 1.1em;
+  vertical-align: middle;
+  user-select: none;
+  position: relative;
+}
+
+.help-popup {
+  position: absolute;
+  left: 2.2em;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: #fff;
+  color: #222;
+  border: 1.5px solid $primary;
+  border-radius: 8px;
+  padding: 10px 14px;
+  min-width: 220px;
+  max-width: 320px;
+  font-size: 0.98em;
+  box-shadow: 0 2px 12px rgba(45, 48, 71, 0.13);
+  white-space: normal;
+  pointer-events: none;
 }
 
 @media (max-width: 899px) {
