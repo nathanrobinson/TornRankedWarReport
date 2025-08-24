@@ -24,10 +24,12 @@ const columns = [
   { key: 'assists', label: 'Assists' },
   { key: 'medOuts', label: 'Med Outs' },
   { key: 'revives', label: 'Revives' },
+  { key: 'chainBuilds', label: 'Chain Builds' },
   { key: 'rewardAttackRespect', label: 'Attack/Respect $' },
   { key: 'rewardAssists', label: 'Assist $' },
   { key: 'rewardMedOuts', label: 'Med Out $' },
   { key: 'rewardRevives', label: 'Revive $' },
+  { key: 'rewardChainBuilds', label: 'Chain Build $' },
   { key: 'totalRewards', label: 'Total $' },
 ]
 
@@ -74,10 +76,12 @@ function exportToCSV() {
     u.assists,
     u.medOuts,
     u.revives,
+    u.chainBuilds,
     formatCurrency(u.rewardAttackRespect),
     formatCurrency(u.rewardAssists),
     formatCurrency(u.rewardMedOuts),
     formatCurrency(u.rewardRevives),
+    formatCurrency(u.rewardChainBuilds),
     formatCurrency(u.totalRewards),
   ])
   const csvContent = [headers, ...rows]
@@ -103,10 +107,12 @@ const columnWidths: Record<string, string> = {
   assists: '50px',
   medOuts: '50px',
   revives: '50px',
+  chainBuilds: '50px',
   rewardAttackRespect: '120px',
   rewardAssists: '110px',
   rewardMedOuts: '110px',
   rewardRevives: '110px',
+  rewardChainBuilds: '110px',
   totalRewards: '120px',
 }
 </script>
@@ -142,10 +148,12 @@ const columnWidths: Record<string, string> = {
             <td>{{ user.assists }}</td>
             <td>{{ user.medOuts }}</td>
             <td>{{ user.revives }}</td>
+            <td>{{ user.chainBuilds }}</td>
             <td>{{ formatCurrency(user.rewardAttackRespect) }}</td>
             <td>{{ formatCurrency(user.rewardAssists) }}</td>
             <td>{{ formatCurrency(user.rewardMedOuts) }}</td>
             <td>{{ formatCurrency(user.rewardRevives) }}</td>
+            <td>{{ formatCurrency(user.rewardChainBuilds) }}</td>
             <td>{{ formatCurrency(user.totalRewards) }}</td>
           </tr>
         </tbody>

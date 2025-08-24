@@ -169,17 +169,25 @@ export class TornApi {
         for (const bonus of chainReport.bonuses) {
           const bonusRespect = bonus.respect > 10 ? bonus.respect - 10 : 0
           if (!chains[bonus.attacker_id]) {
-            chains[bonus.attacker_id] = { id: bonus.attacker_id, assists: 0, bonus: bonusRespect }
+            chains[bonus.attacker_id] = {
+              id: bonus.attacker_id,
+              assists: 0,
+              bonus: bonusRespect,
+              chainBuilds: 0,
+            }
           } else {
             chains[bonus.attacker_id].bonus += bonusRespect
           }
         }
 
         for (const attack of chainReport.attackers) {
+          const assists = attack.attacks?.assists ?? 0
+          const chainBuilds = (attack.attacks?.total ?? 0) - (attack.attacks?.war ?? 0)
           if (!chains[attack.id]) {
-            chains[attack.id] = { id: attack.id, assists: attack.attacks?.assists ?? 0, bonus: 0 }
+            chains[attack.id] = { id: attack.id, assists, chainBuilds, bonus: 0 }
           } else {
-            chains[attack.id].assists += attack.attacks?.assists ?? 0
+            chains[attack.id].assists += assists
+            chains[attack.id].chainBuilds += chainBuilds
           }
         }
       }
@@ -300,6 +308,7 @@ interface PlayerChainReport {
   id: number
   bonus: number
   assists: number
+  chainBuilds: number
 }
 
 interface Chains {

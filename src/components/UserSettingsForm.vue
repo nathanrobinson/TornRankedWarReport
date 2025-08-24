@@ -7,7 +7,8 @@ const attackRewards = ref('')
 const assistRewards = ref('')
 const medOutRewards = ref('')
 const reviveRewards = ref('')
-const minMedOuts = ref('10') // Default to 10
+const chainBuilderRewards = ref('')
+const minMedOuts = ref('10')
 
 // Add payoutType and ignoreChainBonus
 const payoutType = ref<'perAttack' | 'perRespect'>('perRespect')
@@ -32,6 +33,7 @@ function handleSubmit() {
     assistRewards: parseNumber(assistRewards.value),
     medOutRewards: parseNumber(medOutRewards.value),
     reviveRewards: parseNumber(reviveRewards.value),
+    chainBuilderRewards: parseNumber(chainBuilderRewards.value),
     payoutType: payoutType.value,
     ignoreChainBonus: ignoreChainBonusEnabled.value ? ignoreChainBonus.value : false,
     minMedOuts: parseNumber(minMedOuts.value),
@@ -58,12 +60,29 @@ function handleSubmit() {
       <input id="medOutRewards" v-model="medOutRewards" type="text" inputmode="decimal" />
     </div>
     <div>
+      <label
+        for="minMedOuts"
+        title="The threshold number of med outs that a player must have before they are included in the payout calculations"
+        >Minimum Med Outs:</label
+      >
+      <input id="minMedOuts" v-model="minMedOuts" type="number" min="0" />
+    </div>
+    <div>
       <label for="reviveRewards">Revive Rewards:</label>
       <input id="reviveRewards" v-model="reviveRewards" type="text" inputmode="decimal" />
     </div>
     <div>
-      <label for="minMedOuts">Minimum Med Outs:</label>
-      <input id="minMedOuts" v-model="minMedOuts" type="number" min="0" />
+      <label
+        for="chainBuilderRewards"
+        title="If a value is entered, then attacks that build a chain but don't contribute respect will be give a pro-rated reward"
+        >Chain Builder Rewards:</label
+      >
+      <input
+        id="chainBuilderRewards"
+        v-model="chainBuilderRewards"
+        type="text"
+        inputmode="decimal"
+      />
     </div>
     <div>
       <label>Payout Type:</label>
@@ -73,7 +92,9 @@ function handleSubmit() {
       </select>
     </div>
     <div>
-      <label>
+      <label
+        title="If selected, then attacks that received a special chain bonus will be calculated at 10 respect instead of the bonus amount"
+      >
         <input type="checkbox" v-model="ignoreChainBonus" :disabled="!ignoreChainBonusEnabled" />
         Exclude Chain Bonus
       </label>

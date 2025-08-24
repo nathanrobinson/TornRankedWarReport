@@ -69,6 +69,12 @@ function formatCurrency(val: number | null | undefined): string {
       <span>$/:</span>
       <span class="primary">{{ formatCurrency(warStats?.rewardPerRevive) }}</span>
     </div>
+    <div>
+      <span>Total Number of Chain Builds:</span>
+      <span class="primary">{{ warStats?.totalChainBuilds }}</span>
+      <span>$/:</span>
+      <span class="primary">{{ formatCurrency(warStats?.rewardPerChainBuild) }}</span>
+    </div>
   </div>
 </template>
 

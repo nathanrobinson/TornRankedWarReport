@@ -44,9 +44,11 @@ async function getWarReport(apiKey: string) {
   const totalRespect = lastWarReport.score
   let bonusRespect = 0
   let totalAssists = 0
+  let totalChainBuilds = 0
   for (const pid in playerChainReports) {
     bonusRespect += playerChainReports[pid]?.bonus ?? 0
     totalAssists += playerChainReports[pid]?.assists ?? 0
+    totalChainBuilds += playerChainReports[pid]?.chainBuilds ?? 0
   }
 
   let totalRevives = 0
@@ -61,6 +63,7 @@ async function getWarReport(apiKey: string) {
     totalRespect,
     totalAssists,
     totalRevives,
+    totalChainBuilds,
     bonusRespect,
     playerChainReports,
     lastWarReport,
@@ -105,11 +108,13 @@ export async function calculateRewards(settings: RewardSettings): Promise<
     totalAssists: warReport.totalAssists,
     totalMedOuts,
     totalRevives: warReport.totalRevives,
+    totalChainBuilds: warReport.totalChainBuilds,
     rewardPerRespect: settings.attackRewards / (calculatedRespect || 1),
     rewardPerAttack: settings.attackRewards / (warReport.totalAttacks || 1),
     rewardPerAssist: settings.assistRewards / (warReport.totalAssists || 1),
     rewardPerMedOut: settings.medOutRewards / (totalMedOuts || 1),
     rewardPerRevive: settings.reviveRewards / (warReport.totalRevives || 1),
+    rewardPerChainBuild: settings.chainBuilderRewards / (warReport.totalChainBuilds || 1),
   }
 
   const userStats = warReport.lastWarReport.members
@@ -117,6 +122,7 @@ export async function calculateRewards(settings: RewardSettings): Promise<
       let playerRespect = user.score
       const playerBonus = warReport.playerChainReports[user.id]?.bonus
       const playerAssists = warReport.playerChainReports[user.id]?.assists
+      const playerChainBuilds = warReport.playerChainReports[user.id]?.chainBuilds
       const playerMedOutsRaw = warReport.playerDefends[user.id] ?? 0
       // Only count med outs for users meeting the minimum
       const playerMedOuts = playerMedOutsRaw >= minMedOuts ? playerMedOutsRaw : 0
@@ -138,8 +144,9 @@ export async function calculateRewards(settings: RewardSettings): Promise<
       const rewardAssists = blank(playerAssists * warStats.rewardPerAssist)
       const rewardMedOuts = blank(playerMedOuts * warStats.rewardPerMedOut)
       const rewardRevives = blank(playerRevives * warStats.rewardPerRevive)
+      const rewardChainBuilds = blank(playerChainBuilds * warStats.rewardPerChainBuild)
       const totalRewards = blank(
-        rewardAttackRespect + rewardAssists + rewardMedOuts + rewardRevives,
+        rewardAttackRespect + rewardAssists + rewardMedOuts + rewardRevives + rewardChainBuilds,
       )
 
       return {
@@ -151,11 +158,13 @@ export async function calculateRewards(settings: RewardSettings): Promise<
         assists: blank(playerAssists),
         medOuts: blank(playerMedOutsRaw),
         revives: blank(playerRevives),
-        rewardAttackRespect: rewardAttackRespect,
-        rewardAssists: rewardAssists,
-        rewardMedOuts: rewardMedOuts,
-        rewardRevives: rewardRevives,
-        totalRewards: totalRewards,
+        chainBuilds: blank(playerChainBuilds),
+        rewardAttackRespect,
+        rewardAssists,
+        rewardMedOuts,
+        rewardRevives,
+        rewardChainBuilds,
+        totalRewards,
       }
     })
     // Filter out users with no rewards (0 or NaN for all reward fields)

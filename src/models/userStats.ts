@@ -7,9 +7,11 @@ export interface UserStats {
   assists: number
   medOuts: number
   revives: number
+  chainBuilds: number
   rewardAttackRespect: number
   rewardAssists: number
   rewardMedOuts: number
   rewardRevives: number
+  rewardChainBuilds: number
   totalRewards: number
 }

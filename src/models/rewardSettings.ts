@@ -4,6 +4,7 @@ export interface RewardSettings {
   assistRewards: number
   medOutRewards: number
   reviveRewards: number
+  chainBuilderRewards: number
   payoutType: 'perAttack' | 'perRespect'
   ignoreChainBonus: boolean
   minMedOuts: number
