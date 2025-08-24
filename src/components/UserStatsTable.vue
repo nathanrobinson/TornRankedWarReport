@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import type { UserStats } from '@/models/userStats'
 
 const props = defineProps<{
@@ -15,24 +15,83 @@ function formatCurrency(val: number): string {
   })
 }
 
-// Sorting logic
-const columns = [
-  { key: 'name', label: 'Player' },
-  { key: 'attacks', label: 'Attacks' },
-  { key: 'respect', label: 'Respect Earned' },
-  { key: 'bonusRespect', label: 'Bonus Respect' },
-  { key: 'assists', label: 'Assists' },
-  { key: 'medOuts', label: 'Med Outs' },
-  { key: 'revives', label: 'Revives' },
-  { key: 'chainBuilds', label: 'Chain Builds' },
-  { key: 'rewardAttackRespect', label: 'Attack/Respect $' },
-  { key: 'rewardAssists', label: 'Assist $' },
-  { key: 'rewardMedOuts', label: 'Med Out $' },
-  { key: 'rewardRevives', label: 'Revive $' },
-  { key: 'rewardChainBuilds', label: 'Chain Build $' },
-  { key: 'totalRewards', label: 'Total $' },
+// --- Column state and drag/resize logic ---
+const initialColumns = [
+  { key: 'name', label: 'Player', width: 210 },
+  { key: 'totalRewards', label: 'Total $', width: 120 },
+  { key: 'attacks', label: 'Attacks', width: 50 },
+  { key: 'respect', label: 'Respect Earned', width: 50 },
+  { key: 'bonusRespect', label: 'Bonus Respect', width: 50 },
+  { key: 'rewardAttackRespect', label: 'Attack/Respect $', width: 120 },
+  { key: 'assists', label: 'Assists', width: 50 },
+  { key: 'rewardAssists', label: 'Assist $', width: 110 },
+  { key: 'medOuts', label: 'Med Outs', width: 50 },
+  { key: 'rewardMedOuts', label: 'Med Out $', width: 110 },
+  { key: 'revives', label: 'Revives', width: 50 },
+  { key: 'rewardRevives', label: 'Revive $', width: 110 },
+  { key: 'chainBuilds', label: 'Chain Builds', width: 50 },
+  { key: 'rewardChainBuilds', label: 'Chain Build $', width: 110 },
 ]
+const columns = ref([...initialColumns])
 
+// Resizing logic
+const resizing = reactive({
+  colIdx: null as number | null,
+  startX: 0,
+  startWidth: 0,
+})
+function onResizeMouseDown(e: MouseEvent, idx: number) {
+  resizing.colIdx = idx
+  resizing.startX = e.clientX
+  resizing.startWidth = columns.value[idx].width
+  document.addEventListener('mousemove', onResizeMouseMove)
+  document.addEventListener('mouseup', onResizeMouseUp)
+}
+function onResizeMouseMove(e: MouseEvent) {
+  if (resizing.colIdx === null) return
+  const dx = e.clientX - resizing.startX
+  const newWidth = Math.max(40, resizing.startWidth + dx)
+  columns.value[resizing.colIdx].width = newWidth
+}
+function onResizeMouseUp() {
+  resizing.colIdx = null
+  document.removeEventListener('mousemove', onResizeMouseMove)
+  document.removeEventListener('mouseup', onResizeMouseUp)
+}
+
+// Drag-and-drop logic
+const dragging = reactive({
+  fromIdx: null as number | null,
+  overIdx: null as number | null,
+  dragging: false,
+})
+function onDragStart(idx: number, e: DragEvent) {
+  dragging.fromIdx = idx
+  dragging.dragging = true
+  dragging.overIdx = null
+  e.dataTransfer?.setData('text/plain', String(idx))
+  e.dataTransfer?.setDragImage(new Image(), 0, 0)
+}
+function onDragOver(idx: number, e: DragEvent) {
+  e.preventDefault()
+  dragging.overIdx = idx
+}
+function onDrop(idx: number, e: DragEvent) {
+  e.preventDefault()
+  if (dragging.fromIdx === null || dragging.fromIdx === idx) return
+  const col = columns.value.splice(dragging.fromIdx, 1)[0]
+  columns.value.splice(idx, 0, col)
+  dragging.fromIdx = null
+  dragging.overIdx = null
+  dragging.dragging = false
+}
+function onDragEnd() {
+  dragging.fromIdx = null
+  dragging.overIdx = null
+  dragging.dragging = false
+}
+
+// --- Sorting logic ---
 const sortKey = ref('totalRewards')
 const sortDir = ref<'asc' | 'desc'>('desc')
 
@@ -51,7 +110,6 @@ const sortedUsers = computed(() => {
   return [...props.users].sort((a, b) => {
     let aVal = a[key as keyof UserStats]
     let bVal = b[key as keyof UserStats]
-    // For name, sort as string; for others, as numbers
     if (key === 'name') {
       aVal = String(aVal)
       bVal = String(bVal)
@@ -67,23 +125,18 @@ const sortedUsers = computed(() => {
 })
 
 function exportToCSV() {
-  const headers = columns.map((col) => col.label)
-  const rows = sortedUsers.value.map((u) => [
-    `${u.name} [${u.id}]`,
-    u.attacks,
-    u.respect,
-    u.bonusRespect,
-    u.assists,
-    u.medOuts,
-    u.revives,
-    u.chainBuilds,
-    formatCurrency(u.rewardAttackRespect),
-    formatCurrency(u.rewardAssists),
-    formatCurrency(u.rewardMedOuts),
-    formatCurrency(u.rewardRevives),
-    formatCurrency(u.rewardChainBuilds),
-    formatCurrency(u.totalRewards),
-  ])
+  const headers = columns.value.map((col) => col.label)
+  const rows = sortedUsers.value.map((u) =>
+    columns.value.map((col) => {
+      const val =
+        col.key === 'name'
+          ? `${u.name} [${u.id}]`
+          : col.key.startsWith('reward') || col.key === 'totalRewards'
+            ? formatCurrency(u[col.key as keyof UserStats] as number)
+            : u[col.key as keyof UserStats]
+      return val
+    }),
+  )
   const csvContent = [headers, ...rows]
     .map((row) => row.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(','))
     .join('\r\n')
@@ -98,23 +151,6 @@ function exportToCSV() {
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
 }
-
-const columnWidths: Record<string, string> = {
-  name: '210px',
-  attacks: '50px',
-  respect: '50px',
-  bonusRespect: '50px',
-  assists: '50px',
-  medOuts: '50px',
-  revives: '50px',
-  chainBuilds: '50px',
-  rewardAttackRespect: '120px',
-  rewardAssists: '110px',
-  rewardMedOuts: '110px',
-  rewardRevives: '110px',
-  rewardChainBuilds: '110px',
-  totalRewards: '120px',
-}
 </script>
 
 <template>
@@ -125,36 +161,45 @@ const columnWidths: Record<string, string> = {
         <thead>
           <tr>
             <th
-              v-for="col in columns"
+              v-for="(col, idx) in columns"
               :key="col.key"
               @click="sortBy(col.key)"
-              :class="{ sortable: true, sorted: sortKey === col.key }"
-              :style="{ width: columnWidths[col.key] }"
+              :class="[
+                'sortable',
+                { sorted: sortKey === col.key },
+                dragging.dragging && dragging.overIdx === idx ? 'drag-over' : '',
+              ]"
+              :style="{ width: col.width + 'px', position: 'relative' }"
+              draggable="true"
+              @dragstart="onDragStart(idx, $event)"
+              @dragover="onDragOver(idx, $event)"
+              @drop="onDrop(idx, $event)"
+              @dragend="onDragEnd"
             >
-              {{ col.label }}
+              <span class="th-content">{{ col.label }}</span>
               <span v-if="sortKey === col.key">
                 <span v-if="sortDir === 'asc'">&#9650;</span>
                 <span v-else>&#9660;</span>
               </span>
+              <span
+                class="resize-handle"
+                @mousedown.stop="onResizeMouseDown($event, idx)"
+                title="Drag to resize"
+              ></span>
             </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="user in sortedUsers" :key="user.id">
-            <td>{{ user.name }} [{{ user.id }}]</td>
-            <td>{{ user.attacks }}</td>
-            <td>{{ user.respect }}</td>
-            <td>{{ user.bonusRespect }}</td>
-            <td>{{ user.assists }}</td>
-            <td>{{ user.medOuts }}</td>
-            <td>{{ user.revives }}</td>
-            <td>{{ user.chainBuilds }}</td>
-            <td>{{ formatCurrency(user.rewardAttackRespect) }}</td>
-            <td>{{ formatCurrency(user.rewardAssists) }}</td>
-            <td>{{ formatCurrency(user.rewardMedOuts) }}</td>
-            <td>{{ formatCurrency(user.rewardRevives) }}</td>
-            <td>{{ formatCurrency(user.rewardChainBuilds) }}</td>
-            <td>{{ formatCurrency(user.totalRewards) }}</td>
+            <td v-for="col in columns" :key="col.key">
+              <template v-if="col.key === 'name'"> {{ user.name }} [{{ user.id }}] </template>
+              <template v-else-if="col.key.startsWith('reward') || col.key === 'totalRewards'">
+                {{ formatCurrency(user[col.key as keyof UserStats] as number) }}
+              </template>
+              <template v-else>
+                {{ user[col.key as keyof UserStats] }}
+              </template>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -227,6 +272,15 @@ th {
   position: sticky;
   top: 0;
   z-index: 2;
+  user-select: none;
+  .th-content {
+    pointer-events: none;
+  }
+  &.drag-over {
+    outline: 2px dashed $primary;
+    outline-offset: -2px;
+    background: color.adjust($primary, $lightness: 20%);
+  }
 }
 
 td {
@@ -277,6 +331,20 @@ th.sortable {
     vertical-align: middle;
     padding: 0 2px;
     border-radius: 2px;
+  }
+}
+
+.resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 8px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 3;
+  background: transparent;
+  &:hover {
+    background: color.adjust($accent, $lightness: 30%);
   }
 }
 
