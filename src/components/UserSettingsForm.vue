@@ -271,7 +271,6 @@ form {
   padding: 14px 16px 10px 16px;
   max-width: 540px;
   margin: 12px auto 16px auto;
-  box-shadow: 0 2px 16px $form-box-shadow-color;
   overflow-x: auto;
   word-break: break-word;
 }
@@ -322,7 +321,6 @@ button[type='submit'] {
   margin-top: 10px;
   cursor: pointer;
   transition: background-color 0.2s;
-  box-shadow: 0 2px 8px $form-box-shadow-color;
   &:hover {
     background: $form-btn-hover;
   }
