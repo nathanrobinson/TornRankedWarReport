@@ -94,46 +94,63 @@ function exportToCSV() {
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
 }
+
+const columnWidths: Record<string, string> = {
+  name: '210px',
+  attacks: '90px',
+  respect: '110px',
+  bonusRespect: '110px',
+  assists: '90px',
+  medOuts: '90px',
+  revives: '90px',
+  rewardAttackRespect: '120px',
+  rewardAssists: '110px',
+  rewardMedOuts: '110px',
+  rewardRevives: '110px',
+  totalRewards: '120px',
+}
 </script>
 
 <template>
-  <div>
+  <div class="table-scroll-wrapper">
     <button @click="exportToCSV">Export to Spreadsheet</button>
-    <table>
-      <thead>
-        <tr>
-          <th
-            v-for="col in columns"
-            :key="col.key"
-            @click="sortBy(col.key)"
-            :class="{ sortable: true, sorted: sortKey === col.key }"
-            style="cursor: pointer; user-select: none"
-          >
-            {{ col.label }}
-            <span v-if="sortKey === col.key">
-              <span v-if="sortDir === 'asc'">&#9650;</span>
-              <span v-else>&#9660;</span>
-            </span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="user in sortedUsers" :key="user.id">
-          <td>{{ user.name }} [{{ user.id }}]</td>
-          <td>{{ user.attacks }}</td>
-          <td>{{ user.respect }}</td>
-          <td>{{ user.bonusRespect }}</td>
-          <td>{{ user.assists }}</td>
-          <td>{{ user.medOuts }}</td>
-          <td>{{ user.revives }}</td>
-          <td>{{ formatCurrency(user.rewardAttackRespect) }}</td>
-          <td>{{ formatCurrency(user.rewardAssists) }}</td>
-          <td>{{ formatCurrency(user.rewardMedOuts) }}</td>
-          <td>{{ formatCurrency(user.rewardRevives) }}</td>
-          <td>{{ formatCurrency(user.totalRewards) }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-outer-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th
+              v-for="col in columns"
+              :key="col.key"
+              @click="sortBy(col.key)"
+              :class="{ sortable: true, sorted: sortKey === col.key }"
+              :style="{ width: columnWidths[col.key] }"
+            >
+              {{ col.label }}
+              <span v-if="sortKey === col.key">
+                <span v-if="sortDir === 'asc'">&#9650;</span>
+                <span v-else>&#9660;</span>
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="user in sortedUsers" :key="user.id">
+            <td>{{ user.name }} [{{ user.id }}]</td>
+            <td>{{ user.attacks }}</td>
+            <td>{{ user.respect }}</td>
+            <td>{{ user.bonusRespect }}</td>
+            <td>{{ user.assists }}</td>
+            <td>{{ user.medOuts }}</td>
+            <td>{{ user.revives }}</td>
+            <td>{{ formatCurrency(user.rewardAttackRespect) }}</td>
+            <td>{{ formatCurrency(user.rewardAssists) }}</td>
+            <td>{{ formatCurrency(user.rewardMedOuts) }}</td>
+            <td>{{ formatCurrency(user.rewardRevives) }}</td>
+            <td>{{ formatCurrency(user.totalRewards) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -157,33 +174,39 @@ $sort-indicator-shadow:
   -1px 1px 0 $sort-indicator-shadow-color,
   1px 1px 0 $sort-indicator-shadow-color;
 
-button {
-  background: $accent;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 24px;
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 18px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  box-shadow: 0 2px 8px rgba(209, 16, 51, 0.08);
-  &:hover {
-    background: color.adjust($accent, $lightness: 10%);
-  }
+.table-scroll-wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.table-outer-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(45, 48, 71, 0.08);
+  background: #fff;
 }
 
 table {
   border-collapse: separate;
   border-spacing: 0;
-  width: 100%;
+  min-width: 1200px;
+  width: max-content;
   background: #fff;
   border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 16px rgba(45, 48, 71, 0.08);
   table-layout: fixed;
-  word-break: break-word;
+  word-break: normal;
+}
+
+th,
+td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 th {
@@ -194,14 +217,15 @@ th {
   font-weight: 700;
   border-bottom: 3px solid $table-border;
   letter-spacing: 0.03em;
-  word-break: break-word;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 td {
   padding: $table-cell-padding;
   font-size: 1rem;
   border-bottom: 1px solid #e0e0e0;
-  word-break: break-word;
 }
 
 tbody tr {
@@ -230,7 +254,8 @@ tr:last-child td {
 th.sortable {
   cursor: pointer;
   user-select: none;
-  position: relative;
+  position: sticky;
+  top: 0;
   transition: background-color 0.15s;
   &:hover,
   &.sorted {
@@ -245,6 +270,23 @@ th.sortable {
     vertical-align: middle;
     padding: 0 2px;
     border-radius: 2px;
+  }
+}
+
+button {
+  background: $accent;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 18px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 8px rgba(209, 16, 51, 0.08);
+  &:hover {
+    background: color.adjust($accent, $lightness: 10%);
   }
 }
 </style>
