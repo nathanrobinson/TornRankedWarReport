@@ -78,7 +78,7 @@ function hideHelp(key: string) {
           @mouseleave="hideHelp('apiKey')"
           @click="helpOpen === 'apiKey' ? hideHelp('apiKey') : showHelp('apiKey')"
           tabindex="0"
-          >&#x1F6C8;</span
+          >?</span
         >
         <span v-if="helpOpen === 'apiKey'" class="help-popup">{{ helpTexts.apiKey }}</span>
       </label>
@@ -95,7 +95,7 @@ function hideHelp(key: string) {
             helpOpen === 'attackRewards' ? hideHelp('attackRewards') : showHelp('attackRewards')
           "
           tabindex="0"
-          >&#x1F6C8;</span
+          >?</span
         >
         <span v-if="helpOpen === 'attackRewards'" class="help-popup">{{
           helpTexts.attackRewards
@@ -112,7 +112,7 @@ function hideHelp(key: string) {
           @mouseleave="hideHelp('payoutType')"
           @click="helpOpen === 'payoutType' ? hideHelp('payoutType') : showHelp('payoutType')"
           tabindex="0"
-          >&#x1F6C8;</span
+          >?</span
         >
         <span v-if="helpOpen === 'payoutType'" class="help-popup">{{ helpTexts.payoutType }}</span>
       </label>
@@ -135,7 +135,7 @@ function hideHelp(key: string) {
               : showHelp('ignoreChainBonus')
           "
           tabindex="0"
-          >&#x1F6C8;</span
+          >?</span
         >
         <span v-if="helpOpen === 'ignoreChainBonus'" class="help-popup">{{
           helpTexts.ignoreChainBonus
@@ -153,7 +153,7 @@ function hideHelp(key: string) {
             helpOpen === 'assistRewards' ? hideHelp('assistRewards') : showHelp('assistRewards')
           "
           tabindex="0"
-          >&#x1F6C8;</span
+          >?</span
         >
         <span v-if="helpOpen === 'assistRewards'" class="help-popup">{{
           helpTexts.assistRewards
@@ -172,7 +172,7 @@ function hideHelp(key: string) {
             helpOpen === 'medOutRewards' ? hideHelp('medOutRewards') : showHelp('medOutRewards')
           "
           tabindex="0"
-          >&#x1F6C8;</span
+          >?</span
         >
         <span v-if="helpOpen === 'medOutRewards'" class="help-popup">{{
           helpTexts.medOutRewards
@@ -189,7 +189,7 @@ function hideHelp(key: string) {
           @mouseleave="hideHelp('minMedOuts')"
           @click="helpOpen === 'minMedOuts' ? hideHelp('minMedOuts') : showHelp('minMedOuts')"
           tabindex="0"
-          >&#x1F6C8;</span
+          >?</span
         >
         <span v-if="helpOpen === 'minMedOuts'" class="help-popup">{{ helpTexts.minMedOuts }}</span>
       </label>
@@ -206,7 +206,7 @@ function hideHelp(key: string) {
             helpOpen === 'reviveRewards' ? hideHelp('reviveRewards') : showHelp('reviveRewards')
           "
           tabindex="0"
-          >&#x1F6C8;</span
+          >?</span
         >
         <span v-if="helpOpen === 'reviveRewards'" class="help-popup">{{
           helpTexts.reviveRewards
@@ -227,7 +227,7 @@ function hideHelp(key: string) {
               : showHelp('chainBuilderRewards')
           "
           tabindex="0"
-          >&#x1F6C8;</span
+          >?</span
         >
         <span v-if="helpOpen === 'chainBuilderRewards'" class="help-popup">{{
           helpTexts.chainBuilderRewards
@@ -331,9 +331,13 @@ button[type='submit'] {
 .help-icon {
   display: inline-block;
   margin-left: 6px;
-  color: $primary;
+  color: #fff;
+  background: $accent;
+  border: 1px solid $primary;
+  border-radius: 50%;
+  padding: 2px 5px;
   cursor: pointer;
-  font-size: 1.1em;
+  font-size: 8pt;
   vertical-align: middle;
   user-select: none;
   position: relative;
@@ -341,12 +345,9 @@ button[type='submit'] {
 
 .help-popup {
   position: absolute;
-  left: 2.2em;
-  top: 50%;
-  transform: translateY(-50%);
   z-index: 10;
-  background: #fff;
-  color: #222;
+  background: $form-input-bg;
+  color: $accent;
   border: 1.5px solid $primary;
   border-radius: 8px;
   padding: 10px 14px;
