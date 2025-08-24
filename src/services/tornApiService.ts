@@ -1,3 +1,5 @@
+// cSpell:ignore attacksfull chainreport rankedwarreport rankedwars striptags
+
 export class TornApi {
   #key: string
   #baseUrl = 'https://api.torn.com/v2/'
@@ -61,13 +63,13 @@ export class TornApi {
 
   async getRevives(
     factionId: number,
+    opponentFactionId: number,
     start: number,
     end: number,
   ): Promise<{ [playerId: number]: number }> {
     const playerRevives: { [playerId: number]: number } = {}
 
     const query: { [key: string]: string | number } = {
-      filters: 'incoming',
       limit: 1000,
       sort: 'ASC',
       from: start,
@@ -82,7 +84,11 @@ export class TornApi {
 
     while (revives?.revives?.length) {
       for (const revive of revives?.revives) {
-        if (revive.reviver?.faction_id === factionId && revive.target?.faction_id === factionId) {
+        if (
+          revive.reviver?.faction_id === factionId &&
+          (revive.target?.faction_id === factionId ||
+            revive.target?.faction_id === opponentFactionId)
+        ) {
           if (!playerRevives[revive.reviver.id]) {
             playerRevives[revive.reviver.id] = 1
           } else {
@@ -102,8 +108,8 @@ export class TornApi {
   }
 
   async getLosses(
-    defender: number,
-    attacker: number,
+    factionId: number,
+    opponentFactionId: number,
     start: number,
     end: number,
   ): Promise<{ [playerId: number]: number }> {
@@ -124,7 +130,10 @@ export class TornApi {
 
     while (attacks?.attacks?.length) {
       for (const attack of attacks?.attacks) {
-        if (attack.attacker?.faction_id === attacker && attack.defender?.faction_id === defender) {
+        if (
+          attack.attacker?.faction_id === opponentFactionId &&
+          attack.defender?.faction_id === factionId
+        ) {
           if (!playerDefends[attack.defender.id]) {
             playerDefends[attack.defender.id] = 1
           } else {
@@ -179,7 +188,9 @@ export class TornApi {
     return chains
   }
 
-  public async getWarReport(): Promise<{ factionId: number; rankedWar: RankedWar } | undefined> {
+  public async getWarReport(): Promise<
+    { factionId: number; rankedWar: RankedWar | undefined } | undefined
+  > {
     const factionId = await this.#getFactionId()
 
     if (!factionId) {
@@ -192,7 +203,8 @@ export class TornApi {
       return undefined
     }
 
-    const rankedWar = await this.#fetch<RankedWar>(`faction/${lastWar}/rankedwarreport`)
+    const rankedWarReport = await this.#fetch<RankedWarReport>(`faction/${lastWar}/rankedwarreport`)
+    const rankedWar = rankedWarReport?.rankedwarreport
 
     return { factionId, rankedWar }
   }
@@ -251,15 +263,17 @@ interface WarFaction {
   members: FactionMember[]
 }
 
+interface RankedWarReport {
+  rankedwarreport: RankedWar
+}
+
 interface RankedWar {
-  rankedwarreport: {
-    id: number
-    start: number
-    end: number
-    winner: number
-    forfeit: boolean
-    factions: WarFaction[]
-  }
+  id: number
+  start: number
+  end: number
+  winner: number
+  forfeit: boolean
+  factions: WarFaction[]
 }
 
 interface FactionMember {

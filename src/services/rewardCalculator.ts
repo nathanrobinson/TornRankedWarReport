@@ -7,11 +7,11 @@ async function getWarReport(apiKey: string) {
   const tornApi = new TornApi(apiKey)
   const factionWarReport = await tornApi.getWarReport()
 
-  if (!factionWarReport?.factionId || !factionWarReport?.rankedWar?.rankedwarreport) {
+  if (!factionWarReport?.factionId || !factionWarReport?.rankedWar) {
     return
   }
 
-  const lastWarReport = factionWarReport.rankedWar.rankedwarreport.factions.find(
+  const lastWarReport = factionWarReport.rankedWar.factions.find(
     (x) => x.id === factionWarReport.factionId,
   )
 
@@ -19,13 +19,13 @@ async function getWarReport(apiKey: string) {
     return
   }
 
-  const opponent = factionWarReport.rankedWar.rankedwarreport.factions.find(
+  const opponent = factionWarReport.rankedWar.factions.find(
     (x) => x.id !== factionWarReport.factionId,
   )
 
   const currentUnixTimeInSeconds = Math.floor(Date.now() / 1000)
-  const start = factionWarReport.rankedWar.rankedwarreport.start
-  const end = factionWarReport.rankedWar.rankedwarreport.end ?? currentUnixTimeInSeconds
+  const start = factionWarReport.rankedWar.start
+  const end = factionWarReport.rankedWar.end || currentUnixTimeInSeconds
 
   const playerChainReports = await tornApi.getChainReports(start, end)
 
@@ -37,7 +37,7 @@ async function getWarReport(apiKey: string) {
 
   if (factionId && opponentId) {
     playerDefends = await tornApi.getLosses(factionId, opponentId, start, end)
-    playerRevives = await tornApi.getRevives(factionId, start, end)
+    playerRevives = await tornApi.getRevives(factionId, opponentId, start, end)
   }
 
   const totalAttacks = lastWarReport.attacks
@@ -60,7 +60,7 @@ async function getWarReport(apiKey: string) {
   }
 
   return {
-    id: factionWarReport.rankedWar.rankedwarreport.id,
+    id: factionWarReport.rankedWar.id,
     opponent: opponent?.name,
     totalAttacks,
     totalRespect,
@@ -153,14 +153,13 @@ export async function calculateRewards(settings: RewardSettings): Promise<
       }
     })
     // Filter out users with no rewards (0 or NaN for all reward fields)
-    .filter((u) =>
-      [
-        u.rewardAttackRespect,
-        u.rewardAssists,
-        u.rewardMedOuts,
-        u.rewardRevives,
+    .filter(
+      (u) =>
+        u.rewardAttackRespect ||
+        u.rewardAssists ||
+        u.rewardMedOuts ||
+        u.rewardRevives ||
         u.totalRewards,
-      ].some((val) => val),
     )
 
   return {
