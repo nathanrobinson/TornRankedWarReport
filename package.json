@@ -18,7 +18,8 @@
     "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
-    "vue": "^3.5.18"
+    "vue": "^3.5.18",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",

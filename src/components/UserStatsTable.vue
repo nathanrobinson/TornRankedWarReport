@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue'
 import type { UserStats } from '@/models/userStats'
+// Add import for vue-draggable-next
+import draggable from 'vuedraggable'
 
 const props = defineProps<{
   users: UserStats[]
@@ -57,38 +59,6 @@ function onResizeMouseUp() {
   resizing.colIdx = null
   document.removeEventListener('mousemove', onResizeMouseMove)
   document.removeEventListener('mouseup', onResizeMouseUp)
-}
-
-// Drag-and-drop logic
-const dragging = reactive({
-  fromIdx: null as number | null,
-  overIdx: null as number | null,
-  dragging: false,
-})
-function onDragStart(idx: number, e: DragEvent) {
-  dragging.fromIdx = idx
-  dragging.dragging = true
-  dragging.overIdx = null
-  e.dataTransfer?.setData('text/plain', String(idx))
-  e.dataTransfer?.setDragImage(new Image(), 0, 0)
-}
-function onDragOver(idx: number, e: DragEvent) {
-  e.preventDefault()
-  dragging.overIdx = idx
-}
-function onDrop(idx: number, e: DragEvent) {
-  e.preventDefault()
-  if (dragging.fromIdx === null || dragging.fromIdx === idx) return
-  const col = columns.value.splice(dragging.fromIdx, 1)[0]
-  columns.value.splice(idx, 0, col)
-  dragging.fromIdx = null
-  dragging.overIdx = null
-  dragging.dragging = false
-}
-function onDragEnd() {
-  dragging.fromIdx = null
-  dragging.overIdx = null
-  dragging.dragging = false
 }
 
 // --- Sorting logic ---
@@ -159,35 +129,42 @@ function exportToCSV() {
     <div class="table-outer-scroll">
       <table>
         <thead>
-          <tr>
-            <th
-              v-for="(col, idx) in columns"
-              :key="col.key"
-              @click="sortBy(col.key)"
-              :class="[
-                'sortable',
-                { sorted: sortKey === col.key },
-                dragging.dragging && dragging.overIdx === idx ? 'drag-over' : '',
-              ]"
-              :style="{ width: col.width + 'px', position: 'relative' }"
-              draggable="true"
-              @dragstart="onDragStart(idx, $event)"
-              @dragover="onDragOver(idx, $event)"
-              @drop="onDrop(idx, $event)"
-              @dragend="onDragEnd"
-            >
-              <span class="th-content">{{ col.label }}</span>
-              <span v-if="sortKey === col.key">
-                <span v-if="sortDir === 'asc'">&#9650;</span>
-                <span v-else>&#9660;</span>
-              </span>
-              <span
-                class="resize-handle"
-                @mousedown.stop="onResizeMouseDown($event, idx)"
-                title="Drag to resize"
-              ></span>
-            </th>
-          </tr>
+          <!-- Use draggable for columns -->
+          <draggable
+            v-model="columns"
+            tag="tr"
+            :component-data="{ tag: 'tr' }"
+            :animation="150"
+            :ghost-class="'dragging-col'"
+            :chosen-class="'drag-over'"
+            :handle="'.draggable-handle'"
+            item-key="key"
+            :force-fallback="true"
+            :swap-threshold="0.65"
+            :direction="'horizontal'"
+          >
+            <template #item="{ element: col, index: idx }">
+              <th
+                :key="col.key"
+                @click="sortBy(col.key)"
+                :class="['sortable', { sorted: sortKey === col.key }]"
+                :style="{ width: col.width + 'px', position: 'relative' }"
+              >
+                <span class="draggable-handle" style="cursor: grab">
+                  {{ col.label }}
+                </span>
+                <span v-if="sortKey === col.key" class="sort-key">
+                  <span v-if="sortDir === 'asc'">&#9650;</span>
+                  <span v-else>&#9660;</span>
+                </span>
+                <span
+                  class="resize-handle"
+                  @mousedown.stop="onResizeMouseDown($event, idx)"
+                  title="Drag to resize"
+                ></span>
+              </th>
+            </template>
+          </draggable>
         </thead>
         <tbody>
           <tr v-for="user in sortedUsers" :key="user.id">
@@ -270,11 +247,15 @@ th {
   font-weight: 700;
   letter-spacing: 0.03em;
   position: sticky;
+  overflow: wrap;
   top: 0;
   z-index: 2;
   user-select: none;
   .th-content {
     pointer-events: none;
+  }
+  &.dragging-col {
+    opacity: 0.4;
   }
   &.drag-over {
     outline: 2px dashed $primary;
@@ -322,7 +303,7 @@ th.sortable {
   &.sorted {
     background: $primary;
   }
-  span {
+  span.sort-key {
     margin-left: 6px;
     color: #fff;
     text-shadow: $sort-indicator-shadow;
@@ -342,9 +323,10 @@ th.sortable {
   height: 100%;
   cursor: col-resize;
   z-index: 3;
-  background: transparent;
+  background: color.adjust($primary, $lightness: 15%);
+  user-select: none;
   &:hover {
-    background: color.adjust($accent, $lightness: 30%);
+    background: color.adjust($primary, $lightness: -10%);
   }
 }
 
