@@ -10,20 +10,26 @@ import type { UserStats } from '@/models/userStats'
 
 const warStats = ref<WarStats | null | undefined>(undefined)
 const userStats = ref<UserStats[]>([])
+const loading = ref(false)
 
 async function handleUserSettingsSubmit(data: RewardSettings) {
-  // Handle the submitted data as needed
-  console.log('User settings submitted:', data)
-  const battleLog = await calculateRewards(data)
-  userStats.value = battleLog?.userStats ?? []
-  warStats.value = battleLog?.warStats
+  loading.value = true
+  try {
+    // Handle the submitted data as needed
+    console.log('User settings submitted:', data)
+    const battleLog = await calculateRewards(data)
+    userStats.value = battleLog?.userStats ?? []
+    warStats.value = battleLog?.warStats
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
 <template>
   <div class="main-flex">
     <div class="side-by-side">
-      <UserSettingsForm @submit="handleUserSettingsSubmit" />
+      <UserSettingsForm @submit="handleUserSettingsSubmit" :loading="loading" />
       <WarStatsSummary :war-stats="warStats" />
     </div>
     <div class="table-panel">

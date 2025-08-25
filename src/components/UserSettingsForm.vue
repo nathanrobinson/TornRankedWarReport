@@ -27,17 +27,19 @@ const emit = defineEmits<{
 const ignoreChainBonusEnabled = computed(() => payoutType.value === 'perRespect')
 
 function handleSubmit() {
-  emit('submit', {
-    apiKey: apiKey.value,
-    attackRewards: parseNumber(attackRewards.value),
-    assistRewards: parseNumber(assistRewards.value),
-    medOutRewards: parseNumber(medOutRewards.value),
-    reviveRewards: parseNumber(reviveRewards.value),
-    chainBuilderRewards: parseNumber(chainBuilderRewards.value),
-    payoutType: payoutType.value,
-    ignoreChainBonus: ignoreChainBonusEnabled.value ? ignoreChainBonus.value : false,
-    minMedOuts: parseNumber(minMedOuts.value),
-  })
+  if (apiKey.value) {
+    emit('submit', {
+      apiKey: apiKey.value,
+      attackRewards: parseNumber(attackRewards.value),
+      assistRewards: parseNumber(assistRewards.value),
+      medOutRewards: parseNumber(medOutRewards.value),
+      reviveRewards: parseNumber(reviveRewards.value),
+      chainBuilderRewards: parseNumber(chainBuilderRewards.value),
+      payoutType: payoutType.value,
+      ignoreChainBonus: ignoreChainBonusEnabled.value ? ignoreChainBonus.value : false,
+      minMedOuts: parseNumber(minMedOuts.value),
+    })
+  }
 }
 
 const helpOpen = ref<string | null>(null)
@@ -65,6 +67,10 @@ function showHelp(key: string) {
 function hideHelp(key: string) {
   if (helpOpen.value === key) helpOpen.value = null
 }
+
+const props = defineProps<{
+  loading?: boolean
+}>()
 </script>
 
 <template>
@@ -116,10 +122,12 @@ function hideHelp(key: string) {
         >
         <span v-if="helpOpen === 'payoutType'" class="help-popup">{{ helpTexts.payoutType }}</span>
       </label>
-      <select v-model="payoutType">
-        <option value="perAttack">Per Attack</option>
-        <option value="perRespect">Per Respect</option>
-      </select>
+      <div class="select-wrapper">
+        <select v-model="payoutType">
+          <option value="perAttack">Per Attack</option>
+          <option value="perRespect">Per Respect</option>
+        </select>
+      </div>
     </div>
     <div>
       <label>
@@ -240,7 +248,10 @@ function hideHelp(key: string) {
         inputmode="decimal"
       />
     </div>
-    <button type="submit">Submit</button>
+    <button type="submit" :disabled="props.loading">
+      <span v-if="props.loading" class="spinner" aria-label="Loading"></span>
+      <span v-else>Submit</span>
+    </button>
   </form>
 </template>
 
@@ -283,6 +294,30 @@ label {
   display: block;
 }
 
+select {
+  appearance: none;
+  -webkit-appearance: none; /* For older WebKit browsers */
+  -moz-appearance: none; /* For older Firefox browsers */
+}
+
+.select-wrapper {
+  position: relative;
+}
+
+.select-wrapper::after {
+  content: '▼'; /* Unicode character for a down arrow */
+  color: $accent;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none; /* Allows clicks to pass through to the select */
+}
+
+.select-wrapper:hover:after {
+  color: $primary;
+}
+
 input[type='text'],
 input[type='password'],
 input[type='number'],
@@ -321,8 +356,26 @@ button[type='submit'] {
   margin-top: 10px;
   cursor: pointer;
   transition: background-color 0.2s;
+  position: relative;
   &:hover {
     background: $form-btn-hover;
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  border: 2.5px solid #fff;
+  border-top: 2.5px solid $primary;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
   }
 }
 
