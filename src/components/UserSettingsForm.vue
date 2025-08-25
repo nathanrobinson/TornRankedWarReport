@@ -15,7 +15,7 @@ const payoutType = ref<'perAttack' | 'perRespect'>('perRespect')
 const ignoreChainBonus = ref(true)
 
 function parseNumber(value: string): number {
-  const normalized = value.replace(/,\./g, '').replace(/[^0-9]/g, '')
+  const normalized = String(value).replace(/[^0-9]/g, '')
   return Number(normalized)
 }
 
