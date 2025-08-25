@@ -129,7 +129,7 @@ export async function calculateRewards(settings: RewardSettings): Promise<
       const playerRevives = warReport.playerRevives[user.id] ?? 0
 
       if (settings.payoutType === 'perRespect' && settings.ignoreChainBonus && playerBonus > 10) {
-        playerRespect -= Math.min(playerBonus - 10, 0)
+        playerRespect -= Math.max(playerBonus - 10, 0)
       }
 
       // Helper to blank 0/NaN
