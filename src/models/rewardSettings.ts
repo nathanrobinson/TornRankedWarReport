@@ -7,5 +7,6 @@ export interface RewardSettings {
   chainBuilderRewards: number
   payoutType: 'perAttack' | 'perRespect'
   ignoreChainBonus: boolean
+  includeChainBuilders: boolean
   minMedOuts: number
 }

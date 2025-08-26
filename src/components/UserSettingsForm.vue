@@ -13,6 +13,7 @@ const minMedOuts = ref('10')
 // Add payoutType and ignoreChainBonus
 const payoutType = ref<'perAttack' | 'perRespect'>('perRespect')
 const ignoreChainBonus = ref(true)
+const includeChainBuilders = ref(false)
 
 function parseNumber(value: string): number {
   const normalized = String(value).replace(/[^0-9]/g, '')
@@ -25,6 +26,7 @@ const emit = defineEmits<{
 
 // Only enable ignoreChainBonus if payoutType is perRespect
 const ignoreChainBonusEnabled = computed(() => payoutType.value === 'perRespect')
+const includeChainBuildersEnabled = computed(() => payoutType.value === 'perAttack')
 
 function handleSubmit() {
   if (apiKey.value) {
@@ -37,6 +39,7 @@ function handleSubmit() {
       chainBuilderRewards: parseNumber(chainBuilderRewards.value),
       payoutType: payoutType.value,
       ignoreChainBonus: ignoreChainBonusEnabled.value ? ignoreChainBonus.value : false,
+      includeChainBuilders: includeChainBuildersEnabled.value ? includeChainBuilders.value : false,
       minMedOuts: parseNumber(minMedOuts.value),
     })
   }
@@ -59,6 +62,8 @@ const helpTexts: Record<string, string> = {
   payoutType: 'Choose whether attack rewards are distributed per attack or per respect earned.',
   ignoreChainBonus:
     'If checked, attacks with a special chain bonus will be calculated at 10 respect instead of the bonus amount.',
+  includeChainBuilders:
+    'If checked, attacks that are part of a chain but do not contribute respect to the war will be included in payouts. This should not be checked if you are using the Chain Builder Rewards for a separate payout pool or if you only want to include War hits.',
 }
 
 function showHelp(key: string) {
@@ -129,21 +134,46 @@ const props = defineProps<{
         </select>
       </div>
     </div>
-    <div>
+    <div v-if="includeChainBuildersEnabled">
       <label>
-        <input type="checkbox" v-model="ignoreChainBonus" :disabled="!ignoreChainBonusEnabled" />
-        Exclude Chain Bonus
-        <span
-          class="help-icon"
-          @mouseenter="showHelp('ignoreChainBonus')"
-          @mouseleave="hideHelp('ignoreChainBonus')"
-          @click="
-            helpOpen === 'ignoreChainBonus'
-              ? hideHelp('ignoreChainBonus')
-              : showHelp('ignoreChainBonus')
-          "
-          tabindex="0"
-          >?</span
+        <input type="checkbox" v-model="includeChainBuilders" />
+        <span class="label"
+          >Include chain builders with war hits
+          <span
+            class="help-icon"
+            @mouseenter="showHelp('includeChainBuilders')"
+            @mouseleave="hideHelp('includeChainBuilders')"
+            @click="
+              helpOpen === 'includeChainBuilders'
+                ? hideHelp('includeChainBuilders')
+                : showHelp('includeChainBuilders')
+            "
+            tabindex="0"
+            >?</span
+          ></span
+        >
+        <span v-if="helpOpen === 'includeChainBuilders'" class="help-popup">{{
+          helpTexts.includeChainBuilders
+        }}</span>
+      </label>
+    </div>
+    <div v-if="ignoreChainBonusEnabled">
+      <label>
+        <input type="checkbox" v-model="ignoreChainBonus" />
+        <span class="label"
+          >Exclude Chain Bonus
+          <span
+            class="help-icon"
+            @mouseenter="showHelp('ignoreChainBonus')"
+            @mouseleave="hideHelp('ignoreChainBonus')"
+            @click="
+              helpOpen === 'ignoreChainBonus'
+                ? hideHelp('ignoreChainBonus')
+                : showHelp('ignoreChainBonus')
+            "
+            tabindex="0"
+            >?</span
+          ></span
         >
         <span v-if="helpOpen === 'ignoreChainBonus'" class="help-popup">{{
           helpTexts.ignoreChainBonus
@@ -294,7 +324,9 @@ label {
   display: block;
 }
 
-select {
+select,
+input[type='checkbox'],
+input[type='radio'] {
   appearance: none;
   -webkit-appearance: none; /* For older WebKit browsers */
   -moz-appearance: none; /* For older Firefox browsers */
@@ -323,6 +355,10 @@ input[type='password'],
 input[type='number'],
 select {
   width: 100%;
+}
+
+input,
+select {
   box-sizing: border-box;
   padding: 12px 14px;
   border: 1.5px solid $primary;
@@ -333,16 +369,36 @@ select {
   margin-bottom: 2px;
   transition: border-color 0.2s;
   min-width: 0;
-  overflow: hidden;
-  &:focus {
-    border-color: $form-input-focus;
-    outline: none;
+  &:focus,
+  &:hover,
+  &:active {
+    border-color: $accent;
+    outline: 0;
   }
 }
 
 input[type='checkbox'] {
-  accent-color: $primary;
   margin-right: 8px;
+  padding: 10px 8px;
+  width: 45px;
+  height: 45px;
+}
+
+input[type='checkbox']::after {
+  content: '　';
+  position: relative;
+  display: inline-block;
+  color: #2d3047;
+  font-size: 31px;
+  text-align: center;
+  line-height: 20px;
+  font-weight: bold;
+}
+input[type='checkbox']:checked:after {
+  content: '✓';
+}
+span.label {
+  margin-top: -2px;
 }
 
 button[type='submit'] {
@@ -399,6 +455,8 @@ button[type='submit'] {
   z-index: 10;
   background: $form-input-bg;
   color: $accent;
+  font-weight: 100;
+  font-style: italic;
   border: 1.5px solid $accent;
   border-radius: 8px;
   padding: 5px 7px;

@@ -98,19 +98,26 @@ export async function calculateRewards(settings: RewardSettings): Promise<
   }
 
   const calculatedRespect = Math.max(warReport.totalRespect - warReport.bonusRespect, 0)
+  const totalAttacks =
+    (warReport.totalAttacks ?? 0) +
+    (settings.includeChainBuilders ? (warReport.totalChainBuilds ?? 0) : 0)
+  const rewardPerRespect =
+    settings.payoutType == 'perRespect' ? settings.attackRewards / (calculatedRespect || 1) : 0
+  const rewardPerAttack =
+    settings.payoutType == 'perAttack' ? settings.attackRewards / (totalAttacks || 1) : 0
 
   const warStats: WarStats = {
     rankedWarId: warReport.id,
     factionName: warReport.lastWarReport.name,
     opponentName: warReport.opponent ?? '',
-    totalAttacks: warReport.totalAttacks,
+    totalAttacks,
     totalRespect: warReport.totalRespect,
     totalAssists: warReport.totalAssists,
     totalMedOuts,
     totalRevives: warReport.totalRevives,
     totalChainBuilds: warReport.totalChainBuilds,
-    rewardPerRespect: settings.attackRewards / (calculatedRespect || 1),
-    rewardPerAttack: settings.attackRewards / (warReport.totalAttacks || 1),
+    rewardPerRespect,
+    rewardPerAttack,
     rewardPerAssist: settings.assistRewards / (warReport.totalAssists || 1),
     rewardPerMedOut: settings.medOutRewards / (totalMedOuts || 1),
     rewardPerRevive: settings.reviveRewards / (warReport.totalRevives || 1),
@@ -128,8 +135,8 @@ export async function calculateRewards(settings: RewardSettings): Promise<
       const playerMedOuts = playerMedOutsRaw >= minMedOuts ? playerMedOutsRaw : 0
       const playerRevives = warReport.playerRevives[user.id] ?? 0
 
-      if (settings.payoutType === 'perRespect' && settings.ignoreChainBonus && playerBonus > 10) {
-        playerRespect -= (playerBonus - 10)
+      if (settings.payoutType === 'perRespect' && settings.ignoreChainBonus) {
+        playerRespect -= playerBonus
       }
 
       // Helper to blank 0/NaN
@@ -137,7 +144,8 @@ export async function calculateRewards(settings: RewardSettings): Promise<
 
       const rewardAttackRespect = blank(
         settings.payoutType === 'perAttack'
-          ? user.attacks * (warStats.rewardPerAttack ?? 0)
+          ? (user.attacks + (settings.includeChainBuilders ? playerChainBuilds : 0)) *
+              (warStats.rewardPerAttack ?? 0)
           : playerRespect * (warStats.rewardPerRespect ?? 0),
       )
 
