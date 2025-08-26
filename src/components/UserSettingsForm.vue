@@ -92,6 +92,12 @@ const props = defineProps<{
           >?</span
         >
         <span v-if="helpOpen === 'apiKey'" class="help-popup">{{ helpTexts.apiKey }}</span>
+        <a
+          class="small"
+          href="https://www.torn.com/preferences.php#tab=api?&step=addNewKey&title=TornRankedWarReport&type=3"
+          target="_new"
+          >Create API Key</a
+        >
       </label>
       <input id="apiKey" v-model="apiKey" type="password" required />
     </div>
@@ -322,6 +328,15 @@ label {
   font-weight: 600;
   margin-bottom: 6px;
   display: block;
+}
+
+label > a.small {
+  color: $accent;
+  font-size: 75%;
+  font-weight: 100;
+  margin-left: 8px;
+  text-decoration: none;
+  display: inline-block;
 }
 
 select,
