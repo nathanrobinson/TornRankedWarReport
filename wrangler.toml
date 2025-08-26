@@ -1,5 +1,4 @@
 name = "ranked-war-report"
-main = "workers-site/index.js"
 compatibility_date = "2025-08-25"
 
 [site]
