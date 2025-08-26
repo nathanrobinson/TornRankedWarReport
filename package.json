@@ -12,6 +12,8 @@
     "preview": "vite preview",
     "test:unit": "vitest",
     "build-only": "vite build",
+    "build-gh": "run-p type-check \"build-only-gh {@}\" --",
+    "build-only-gh": "vite build --base=/TornRankedWarReport/",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
