@@ -1,6 +1,0 @@
-name = "ranked-war-report"
-compatibility_date = "2025-08-25"
-
-[assets]
-directory = "./dist/"
-not_found_handling = "single-page-application"
