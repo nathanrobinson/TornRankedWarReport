@@ -1,6 +1,0 @@
-name = "ranked-war-report"
-main = "src/index.js"
-compatibility_date = "2025-08-25"
-
-[assets]
-directory = "./dist"
