@@ -186,18 +186,17 @@ function exportToCSV() {
 
 <style lang="scss" scoped>
 @use 'sass:color';
+@use '@/styles/variables';
 
-$primary: #b5112f;
-$accent: #2d3047;
-$table-header-bg: color.adjust($primary, $lightness: 10%);
+$table-header-bg: variables.$primary-mid-light;
 $table-header-text: #fff;
 $table-row-even: #fff;
 $table-row-odd: #efeeee;
-$table-border: $accent;
+$table-border: variables.$accent;
 $table-row-hover-fg: #fff;
-$table-row-hover: color.adjust($accent, $lightness: 25%);
+$table-row-hover: variables.$accent-light;
 $table-cell-padding: 8px 12px;
-$sort-indicator-shadow-color: color.adjust($accent, $lightness: -10%);
+$sort-indicator-shadow-color: variables.$accent-mid-dark;
 $sort-indicator-shadow:
   -1px -1px 0 $sort-indicator-shadow-color,
   1px -1px 0 $sort-indicator-shadow-color,
@@ -258,9 +257,9 @@ th {
     opacity: 0.4;
   }
   &.drag-over {
-    outline: 2px dashed $primary;
+    outline: 2px dashed variables.$primary;
     outline-offset: -2px;
-    background: color.adjust($primary, $lightness: 20%);
+    background: variables.$primary-light;
   }
 }
 
@@ -301,7 +300,7 @@ th.sortable {
   transition: background-color 0.15s;
   &:hover,
   &.sorted {
-    background: $primary;
+    background: variables.$primary;
   }
   span.sort-key {
     margin-left: 6px;
@@ -323,15 +322,15 @@ th.sortable {
   height: 100%;
   cursor: col-resize;
   z-index: 3;
-  background: color.adjust($primary, $lightness: 15%);
+  background: variables.$primary-light;
   user-select: none;
   &:hover {
-    background: color.adjust($primary, $lightness: -10%);
+    background: variables.$primary-mid-dark;
   }
 }
 
 button {
-  background: $accent;
+  background: variables.$accent;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -341,9 +340,9 @@ button {
   margin-bottom: 18px;
   cursor: pointer;
   transition: background-color 0.2s;
-  box-shadow: 0 2px 8px rgba(209, 16, 51, 0.08);
+  box-shadow: 0 2px 8px color.change(variables.$accent, $alpha: 0.08);
   &:hover {
-    background: color.adjust($accent, $lightness: 10%);
+    background: variables.$accent-mid-light;
   }
 }
 </style>

@@ -293,18 +293,17 @@ const props = defineProps<{
 
 <style lang="scss" scoped>
 @use 'sass:color';
+@use '@/styles/variables';
 
-$primary: #b5112f;
-$accent: #2d3047;
 $form-bg: #fff;
-$form-border: $accent;
-$form-label: $primary;
+$form-border: variables.$accent;
+$form-label: variables.$primary;
 $form-input-bg: #fff4f6;
-$form-input-focus: $accent;
-$form-btn-bg: $accent;
-$form-btn-hover: color.adjust($accent, $lightness: 10%);
+$form-input-focus: variables.$accent;
+$form-btn-bg: variables.$accent;
+$form-btn-hover: variables.$accent-mid-light;
 $form-btn-text: #fff;
-$form-box-shadow-color: color.adjust($accent, $lightness: -30%);
+$form-box-shadow-color: variables.$accent-dark;
 
 form {
   background: $form-bg;
@@ -331,7 +330,7 @@ label {
 }
 
 label > a.small {
-  color: $accent;
+  color: variables.$accent;
   font-size: 75%;
   font-weight: 100;
   margin-left: 8px;
@@ -353,7 +352,7 @@ input[type='radio'] {
 
 .select-wrapper::after {
   content: '▼'; /* Unicode character for a down arrow */
-  color: $accent;
+  color: variables.$accent;
   position: absolute;
   right: 10px;
   top: 50%;
@@ -362,7 +361,7 @@ input[type='radio'] {
 }
 
 .select-wrapper:hover:after {
-  color: $primary;
+  color: variables.$primary;
 }
 
 input[type='text'],
@@ -376,7 +375,7 @@ input,
 select {
   box-sizing: border-box;
   padding: 12px 14px;
-  border: 1.5px solid $primary;
+  border: 1.5px solid variables.$primary;
   border-radius: 6px;
   background: $form-input-bg;
   font-size: 1rem;
@@ -387,7 +386,7 @@ select {
   &:focus,
   &:hover,
   &:active {
-    border-color: $accent;
+    border-color: variables.$accent;
     outline: 0;
   }
 }
@@ -438,7 +437,7 @@ button[type='submit'] {
   width: 1.2em;
   height: 1.2em;
   border: 2.5px solid #fff;
-  border-top: 2.5px solid $primary;
+  border-top: 2.5px solid variables.$primary;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   vertical-align: middle;
@@ -454,8 +453,8 @@ button[type='submit'] {
   display: inline-block;
   margin-left: 6px;
   color: #fff;
-  background: $accent;
-  border: 1px solid $primary;
+  background: variables.$accent;
+  border: 1px solid variables.$primary;
   border-radius: 50%;
   padding: 2px 5px;
   cursor: pointer;
@@ -469,10 +468,10 @@ button[type='submit'] {
   position: absolute;
   z-index: 10;
   background: $form-input-bg;
-  color: $accent;
+  color: variables.$accent;
   font-weight: 100;
   font-style: italic;
-  border: 1.5px solid $accent;
+  border: 1.5px solid variables.$accent;
   border-radius: 8px;
   padding: 5px 7px;
   min-width: 220px;

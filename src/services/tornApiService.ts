@@ -3,18 +3,18 @@
 export class TornApi {
   #key: string
   #baseUrl = 'https://api.torn.com/v2/'
+  #comment = 'TornRankedWarReport'
 
   constructor(key: string) {
     this.#key = key
   }
 
   async #fetch<T>(path: string, query?: { [key: string]: string | number }): Promise<T> {
-    let uri = `${this.#baseUrl}${path}`
+    let uri = `${this.#baseUrl}${path}?comment=${this.#comment}`
+
     if (query) {
-      let first = true
       for (const key in query) {
-        uri += `${first ? '?' : '&'}${key}=${query[key]}`
-        first = false
+        uri += `&${key}=${query[key]}`
       }
     }
 

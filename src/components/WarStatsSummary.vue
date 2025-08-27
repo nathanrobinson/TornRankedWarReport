@@ -80,17 +80,16 @@ function formatCurrency(val: number | null | undefined): string {
 
 <style lang="scss" scoped>
 @use 'sass:color';
+@use '@/styles/variables';
 
-$primary: #b5112f;
-$accent: #2d3047;
 $card-bg: #fff;
-$card-border: $accent;
-$card-title: $primary;
-$card-label: $accent;
+$card-border: variables.$accent;
+$card-title: variables.$primary;
+$card-label: variables.$accent;
 $card-value: #222;
-$link-color: $primary;
-$link-hover: $accent;
-$box-shadow-color: color.change($accent, $alpha: 0.08);
+$link-color: variables.$primary;
+$link-hover: variables.$accent;
+$box-shadow-color: color.change(variables.$accent, $alpha: 0.08);
 
 div {
   background: $card-bg;
@@ -124,7 +123,7 @@ a {
 
 #warStats > div {
   color: $card-value;
-  border-color: $primary;
+  border-color: variables.$primary;
   font-weight: 500;
   margin-bottom: 10px;
   font-size: 1.08rem;
@@ -144,7 +143,7 @@ a {
 }
 
 .primary {
-  color: $primary;
+  color: variables.$primary;
   font-weight: 600;
 }
 

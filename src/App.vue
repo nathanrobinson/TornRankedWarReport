@@ -36,14 +36,18 @@ async function handleUserSettingsSubmit(data: RewardSettings) {
       <UserStatsTable :users="userStats" />
     </div>
   </div>
+  <footer class="footer">
+    <span class="primary">Torn Ranked War Report</span> provided by
+    <a href="https://www.torn.com/profiles.php?XID=3733696">TheDawgLives</a>
+  </footer>
 </template>
 
 <style lang="scss">
-$app-bg: #c8c0c2;
+@use '@/styles/variables';
 
 body,
 #app {
-  background-color: $app-bg;
+  background-color: variables.$app-bg;
   min-height: 100vh;
   font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
   padding: 0;
@@ -52,6 +56,8 @@ body,
 </style>
 
 <style lang="scss" scoped>
+@use '@/styles/variables';
+
 .main-flex {
   display: flex;
   flex-direction: column;
@@ -70,6 +76,21 @@ body,
   width: 100%;
   min-width: 0;
   flex: 1 1 0;
+}
+
+footer {
+  font-weight: 100;
+  font-size: 85%;
+  text-align: center;
+
+  .primary {
+    color: variables.$primary;
+  }
+
+  a {
+    color: variables.$accent;
+    text-decoration: none;
+  }
 }
 
 /* Responsive: side by side on large screens */
