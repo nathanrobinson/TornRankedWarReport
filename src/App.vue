@@ -60,7 +60,7 @@ body,
 @use '@/styles/variables';
 
 h1 {
-  color: $primary;
+  color: variables.$primary;
 }
 
 .main-flex {
