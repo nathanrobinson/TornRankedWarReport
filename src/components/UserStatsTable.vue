@@ -45,14 +45,15 @@ const resizing = reactive({
 function onResizeMouseDown(e: MouseEvent, idx: number) {
   resizing.colIdx = idx
   resizing.startX = e.clientX
-  resizing.startWidth = columns.value[idx].width
+  resizing.startWidth = columns.value[idx]?.width ?? 0
   document.addEventListener('mousemove', onResizeMouseMove)
   document.addEventListener('mouseup', onResizeMouseUp)
 }
 function onResizeMouseMove(e: MouseEvent) {
-  if (resizing.colIdx === null) return
+  if (resizing.colIdx === null || !columns.value[resizing.colIdx]) return
   const dx = e.clientX - resizing.startX
   const newWidth = Math.max(40, resizing.startWidth + dx)
+  // @ts-ignore: Object is possibly 'undefined' because we've handled the null case previously.
   columns.value[resizing.colIdx].width = newWidth
 }
 function onResizeMouseUp() {

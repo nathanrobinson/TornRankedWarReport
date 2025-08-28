@@ -92,6 +92,7 @@ export class TornApi {
           if (!playerRevives[revive.reviver.id]) {
             playerRevives[revive.reviver.id] = 1
           } else {
+            // @ts-ignore: Object is possibly 'undefined' because we've handled the null case previously.
             playerRevives[revive.reviver.id]++
           }
         }
@@ -137,6 +138,7 @@ export class TornApi {
           if (!playerDefends[attack.defender.id]) {
             playerDefends[attack.defender.id] = 1
           } else {
+            // @ts-ignore: Object is possibly 'undefined' because we've handled the null case previously.
             playerDefends[attack.defender.id]++
           }
         }
@@ -176,6 +178,7 @@ export class TornApi {
               chainBuilds: 0,
             }
           } else {
+            // @ts-ignore: Object is possibly 'undefined' because we've handled the null case previously.
             chains[bonus.attacker_id].bonus += bonusRespect
           }
         }
@@ -186,7 +189,9 @@ export class TornApi {
           if (!chains[attack.id]) {
             chains[attack.id] = { id: attack.id, assists, chainBuilds, bonus: 0 }
           } else {
+            // @ts-ignore: Object is possibly 'undefined' because we've handled the null case previously.
             chains[attack.id].assists += assists
+            // @ts-ignore: Object is possibly 'undefined' because we've handled the null case previously.
             chains[attack.id].chainBuilds += chainBuilds
           }
         }
