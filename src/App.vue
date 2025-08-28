@@ -27,6 +27,7 @@ async function handleUserSettingsSubmit(data: RewardSettings) {
 </script>
 
 <template>
+  <h1>Torn Ranked War Report</h1>
   <div class="main-flex">
     <div class="side-by-side">
       <UserSettingsForm @submit="handleUserSettingsSubmit" :loading="loading" />
@@ -57,6 +58,10 @@ body,
 
 <style lang="scss" scoped>
 @use '@/styles/variables';
+
+h1 {
+  color: $primary;
+}
 
 .main-flex {
   display: flex;
