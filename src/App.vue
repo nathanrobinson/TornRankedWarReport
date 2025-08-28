@@ -61,20 +61,21 @@ body,
 
 h1 {
   color: variables.$primary;
+  margin: 1em 0 0.25em 1em;
 }
 
 .main-flex {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 0.75em;
   margin: 0 auto;
-  padding: 24px 8px;
+  padding: 0 0.3em;
 }
 
 .side-by-side {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0.5em;
 }
 
 .table-panel {
