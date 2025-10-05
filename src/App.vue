@@ -1,5 +1,6 @@
 <script setup lang="ts">
 
+import { onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import RankedWarReport from './components/RankedWarReport.vue'
 import UserAttackHistory from './components/UserAttackHistory.vue'
 import { useTabs } from './components/useTabs'
@@ -8,6 +9,62 @@ const { activeTab, tabs, setTab } = useTabs([
   'Ranked War Report',
   'User Attack History',
 ])
+
+// Helper: slugify tab labels into hash-friendly strings
+const tabSlugs = computed(() =>
+  tabs.map((t) =>
+    String(t)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, ''),
+  ),
+)
+
+function applyHashToTab(hash: string) {
+  if (!hash) return
+  const raw = hash.replace(/^#/, '')
+  if (!raw) return
+  // If hash is a number, use it as an index
+  const asNum = Number(raw)
+  if (!Number.isNaN(asNum) && Number.isInteger(asNum)) {
+    if (asNum >= 0 && asNum < tabs.length) setTab(asNum)
+    return
+  }
+  // Otherwise match slug
+  const idx = tabSlugs.value.findIndex((s) => s === raw)
+  if (idx !== -1) setTab(idx)
+}
+
+function onHashChange() {
+  applyHashToTab(window.location.hash)
+}
+
+onMounted(() => {
+  // Apply initial hash (if any)
+  applyHashToTab(window.location.hash)
+  window.addEventListener('hashchange', onHashChange)
+  // Also listen for popstate so back/forward navigates pushed tab history
+  window.addEventListener('popstate', onHashChange)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('hashchange', onHashChange)
+  window.removeEventListener('popstate', onHashChange)
+})
+
+// Keep URL hash in sync when activeTab changes
+watch(
+  () => activeTab.value,
+  (idx) => {
+    const slug = tabSlugs.value[idx] ?? ''
+    if (slug) {
+      const newHash = `#${slug}`
+      if (window.location.hash !== newHash) window.history.pushState(null, '', newHash)
+    }
+  },
+)
+
+
 </script>
 
 <template>
@@ -80,6 +137,13 @@ body,
   border-top: 2px solid variables.$accent;
   color: variables.$primary;
   background-color: $active-tab-bg;
+}
+.tab-anchor {
+  margin-left: 8px;
+  font-size: 12pt;
+  opacity: 0.7;
+  text-decoration: none;
+  color: inherit;
 }
 .tab-content {
   background: variables.$panel-bg;
