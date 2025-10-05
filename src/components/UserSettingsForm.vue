@@ -29,7 +29,7 @@ const ignoreChainBonusEnabled = computed(() => payoutType.value === 'perRespect'
 const includeChainBuildersEnabled = computed(() => payoutType.value === 'perAttack')
 
 function handleSubmit() {
-  if (apiKey.value) {
+  if (apiKey.value && !props.loading) {
     emit('submit', {
       apiKey: apiKey.value,
       attackRewards: parseNumber(attackRewards.value),
@@ -55,7 +55,7 @@ const helpTexts: Record<string, string> = {
   assistRewards: 'Total amount of money to distribute for assists.',
   medOutRewards: 'Total amount of money to distribute for med outs (hospitalizes).',
   minMedOuts:
-    'The minimum number of med outs a player must have to be eligible for med out rewards.',
+    'The minimum number of med outs a player must have to be eligible for med out rewards. It is recommended to set this to at least 10 to exclude people who did not actively med out.',
   reviveRewards: 'Total amount of money to distribute for revives.',
   chainBuilderRewards:
     'If set, attacks that build a chain but do not contribute respect will receive a pro-rated reward.',
@@ -295,19 +295,9 @@ const props = defineProps<{
 @use 'sass:color';
 @use '@/styles/variables';
 
-$form-bg: #fff;
-$form-border: variables.$accent;
-$form-label: variables.$primary;
-$form-input-bg: #fff4f6;
-$form-input-focus: variables.$accent;
-$form-btn-bg: variables.$accent;
-$form-btn-hover: variables.$accent-mid-light;
-$form-btn-text: #fff;
-$form-box-shadow-color: variables.$accent-dark;
-
 form {
-  background: $form-bg;
-  border: 2px solid $form-border;
+  background: variables.$form-bg;
+  border: 2px solid variables.$form-border;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -323,7 +313,7 @@ form {
 
 label {
   position: relative;
-  color: $form-label;
+  color: variables.$form-label;
   font-weight: 600;
   margin-bottom: 6px;
   display: block;
@@ -377,7 +367,7 @@ select {
   padding: 12px 14px;
   border: 1.5px solid variables.$primary;
   border-radius: 6px;
-  background: $form-input-bg;
+  background: variables.$form-input-bg;
   font-size: 1rem;
   margin-top: 4px;
   margin-bottom: 2px;
@@ -416,8 +406,8 @@ span.label {
 }
 
 button[type='submit'] {
-  background: $form-btn-bg;
-  color: $form-btn-text;
+  background: variables.$form-btn-bg;
+  color: variables.$form-btn-text;
   border: none;
   border-radius: 6px;
   padding: 12px 0;
@@ -428,7 +418,7 @@ button[type='submit'] {
   transition: background-color 0.2s;
   position: relative;
   &:hover {
-    background: $form-btn-hover;
+    background: variables.$form-btn-hover;
   }
 }
 
@@ -467,7 +457,7 @@ button[type='submit'] {
 .help-popup {
   position: absolute;
   z-index: 10;
-  background: $form-input-bg;
+  background: variables.$form-input-bg;
   color: variables.$accent;
   font-weight: 100;
   font-style: italic;
@@ -477,7 +467,7 @@ button[type='submit'] {
   min-width: 220px;
   max-width: 320px;
   font-size: 0.98em;
-  box-shadow: 0 2px 12px $form-box-shadow-color;
+  box-shadow: 0 2px 12px variables.$form-box-shadow-color;
   white-space: normal;
   pointer-events: none;
 }

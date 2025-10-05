@@ -1,40 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import UserSettingsForm from './components/UserSettingsForm.vue'
-import WarStatsSummary from './components/WarStatsSummary.vue'
-import UserStatsTable from './components/UserStatsTable.vue'
-import { calculateRewards } from '@/services/rewardCalculator'
-import type { RewardSettings } from '@/models/rewardSettings'
-import type { WarStats } from '@/models/warStats'
-import type { UserStats } from '@/models/userStats'
 
-const warStats = ref<WarStats | null | undefined>(undefined)
-const userStats = ref<UserStats[]>([])
-const loading = ref(false)
+import RankedWarReport from './components/RankedWarReport.vue'
+import UserAttackHistory from './components/UserAttackHistory.vue'
+import { useTabs } from './components/useTabs'
 
-async function handleUserSettingsSubmit(data: RewardSettings) {
-  loading.value = true
-  try {
-    // Handle the submitted data as needed
-    console.log('User settings submitted:', data)
-    const battleLog = await calculateRewards(data)
-    userStats.value = battleLog?.userStats ?? []
-    warStats.value = battleLog?.warStats
-  } finally {
-    loading.value = false
-  }
-}
+const { activeTab, tabs, setTab } = useTabs([
+  'Ranked War Report',
+  'User Attack History',
+])
 </script>
 
 <template>
-  <h1>Torn Ranked War Report</h1>
-  <div class="main-flex">
-    <div class="side-by-side">
-      <UserSettingsForm @submit="handleUserSettingsSubmit" :loading="loading" />
-      <WarStatsSummary :war-stats="warStats" />
+  <div class="tab-group">
+    <div class="tab-headers">
+      <button
+        v-for="(tab, idx) in tabs"
+        :key="tab"
+        :class="['tab-btn', { active: activeTab === idx }]"
+        @click="setTab(idx)"
+      >
+        {{ tab }}
+      </button>
     </div>
-    <div class="table-panel">
-      <UserStatsTable :users="userStats" />
+    <div class="tab-content">
+      <div v-if="activeTab === 0">
+        <RankedWarReport />
+      </div>
+      <div v-else-if="activeTab === 1">
+        <UserAttackHistory />
+      </div>
     </div>
   </div>
   <footer class="footer">
@@ -45,6 +39,10 @@ async function handleUserSettingsSubmit(data: RewardSettings) {
 
 <style lang="scss">
 @use '@/styles/variables';
+@use 'sass:color';
+
+$active-tab-bg: variables.$panel-bg;
+$inactive-tab-bg: color.adjust(variables.$app-bg, $lightness: 10%);
 
 body,
 #app {
@@ -54,14 +52,40 @@ body,
   padding: 0;
   margin: 0;
 }
-</style>
 
-<style lang="scss" scoped>
-@use '@/styles/variables';
+.tab-group {
+  margin: 0 auto 2em auto;
+  max-width: 1200px;
+}
+.tab-headers {
+  display: flex;
+  gap: 0.5em;
+}
+.tab-btn {
+  margin: 1em 0 0 1em;
+  font-size: 24pt;
+  border-radius: 5px 5px 0 0;
+  background-color: variables.$panel-bg;
 
-h1 {
+  padding: 0.5em 1.5em;
+  border: none;
+  background: $inactive-tab-bg;
+  color: variables.$accent;
+  font-weight: 600;
+  border-top: 3px solid variables.$primary;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.tab-btn.active {
+  border-top: 2px solid variables.$accent;
   color: variables.$primary;
-  margin: 1em 0 0.25em 1em;
+  background-color: $active-tab-bg;
+}
+.tab-content {
+  background: variables.$panel-bg;
+  border-radius: 0.5em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 1.5em 1em 1em 1em;
 }
 
 .main-flex {

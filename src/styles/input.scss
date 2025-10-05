@@ -1,0 +1,73 @@
+@use 'sass:color';
+@use './variables' as variables;
+
+// Shared input and button styles used by form-like components
+
+input[type='text'],
+input[type='password'],
+input[type='number'],
+select {
+  width: 100%;
+}
+
+input,
+select {
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1.5px solid variables.$primary;
+  border-radius: 6px;
+  // Match UserSettingsForm's $form-input-bg
+  background: #fff4f6;
+  font-size: 1rem;
+  margin-top: 4px;
+  margin-bottom: 2px;
+  transition: border-color 0.2s;
+  min-width: 0;
+  &:focus,
+  &:hover,
+  &:active {
+    border-color: variables.$accent;
+    outline: 0;
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-primary,
+button[type='submit'] {
+  background: variables.$accent;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  position: relative;
+  &:hover {
+    background: variables.$accent-mid-light;
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  border: 2.5px solid #fff;
+  border-top: 2.5px solid variables.$primary;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}

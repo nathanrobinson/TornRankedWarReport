@@ -10,13 +10,31 @@ export class TornApi {
   }
 
   async #fetch<T>(path: string, query?: { [key: string]: string | number }): Promise<T> {
-    let uri = `${this.#baseUrl}${path}?comment=${this.#comment}`
+    let uri = `${this.#baseUrl}${path}`
 
     if (query) {
+      let first = true
       for (const key in query) {
-        uri += `&${key}=${query[key]}`
+        uri += (first ? '?' : '&') + `${key}=${query[key]}`
+        first = false
       }
     }
+
+    const response = await this.#fetchExact<T>(uri)
+
+    return response
+  }
+
+  async #fetchExact<T>(uri: string): Promise<T> {
+    const unixTimestamp = Math.floor(Date.now() / 1000)
+
+    if (uri.indexOf('?') >= 0) {
+      uri += '&'
+    } else {
+      uri += '?'
+    }
+
+    uri += `comment=${this.#comment}&timestamp=${unixTimestamp}`
 
     const response = await fetch(uri, {
       headers: {
@@ -99,7 +117,7 @@ export class TornApi {
       }
 
       if (revives._metadata?.links?.next) {
-        revives = await this.#fetch<ReviveLog>(revives._metadata.links.next)
+        revives = await this.#fetchExact<ReviveLog>(revives._metadata.links.next)
       } else {
         revives = null
       }
@@ -145,7 +163,7 @@ export class TornApi {
       }
 
       if (attacks._metadata?.links?.next) {
-        attacks = await this.#fetch<AttackLog>(attacks._metadata.links.next)
+        attacks = await this.#fetchExact<AttackLog>(attacks._metadata.links.next)
       } else {
         attacks = null
       }
@@ -220,6 +238,41 @@ export class TornApi {
     const rankedWar = rankedWarReport?.rankedwarreport
 
     return { factionId, rankedWar }
+  }
+
+  public async getUserAttacks(count: number = 100) {
+    count = Number(count)
+    if (isNaN(count) || count <= 0) {
+      count = 100
+    }
+
+    const pageSize = count > 100 ? 100 : count
+
+    let attackReport = await this.#fetch<UserAttacksReport>('user/attacks', {
+      filters: 'outgoing',
+      limit: pageSize,
+      sort: 'DESC',
+    })
+
+    const attacks: UserAttack[] = attackReport.attacks
+    let total = attacks.length
+
+    while (total < count && attackReport._metadata.links.prev) {
+      const next = count - total
+      let nextUrl = attackReport._metadata.links.prev
+
+      if (next < pageSize) {
+        nextUrl = nextUrl.replace('limit=100', `limit=${next}`)
+      }
+
+      attackReport = await this.#fetchExact<UserAttacksReport>(nextUrl)
+
+      total += attackReport.attacks.length
+
+      attacks.push(...attackReport.attacks)
+    }
+
+    return attacks
   }
 }
 
@@ -439,5 +492,63 @@ interface ReviveLog {
       next: string
       prev: string
     }
+  }
+}
+
+interface UserAttacksReport {
+  attacks: UserAttack[]
+  _metadata: {
+    links: {
+      next: string
+      prev: string
+    }
+  }
+}
+
+interface UserAttack {
+  id: number
+  code: string
+  started: number
+  ended: number
+  attacker: {
+    id: number
+    name: string
+    level: number
+    faction: {
+      id: number
+      name: string
+    }
+  }
+  defender: {
+    id: number
+    name: string
+    level: number
+    faction: {
+      id: number
+      name: string
+    }
+  }
+  result: string
+  respect_gain: number
+  respect_loss: number
+  chain: number
+  is_interrupted: boolean
+  is_stealthed: boolean
+  is_raid: boolean
+  is_ranked_war: boolean
+  finishing_hit_effects: [
+    {
+      name: string
+      value: number
+    },
+  ]
+  modifiers: {
+    fair_fight: number
+    war: number
+    retaliation: number
+    group: number
+    overseas: number
+    chain: number
+    warlord: number
   }
 }

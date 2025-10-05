@@ -1,6 +1,7 @@
 @use 'sass:color';
 
 $app-bg: #c8c0c2;
+$panel-bg: color.adjust($app-bg, $lightness: 25%);
 $primary: #b5112f;
 $accent: #2d3047;
 
@@ -13,3 +14,13 @@ $accent-light: color.adjust($accent, $lightness: 25%);
 $accent-mid-light: color.adjust($accent, $lightness: 10%);
 $accent-mid-dark: color.adjust($accent, $lightness: -10%);
 $accent-dark: color.adjust($accent, $lightness: -25%);
+
+$form-bg: #fff;
+$form-border: $accent;
+$form-label: $primary;
+$form-input-bg: #fff4f6;
+$form-input-focus: $accent;
+$form-btn-bg: $accent;
+$form-btn-hover: $accent-mid-light;
+$form-btn-text: #fff;
+$form-box-shadow-color: $accent-dark;
