@@ -8,7 +8,7 @@ const props = defineProps<{ attacks: WeightedUserAttack[]; }>()
 const minWeighted = ref(0)
 
 // Sorting
-const sortKey = ref<'wins' | 'losses' | 'stalemates' | 'weightedRespect' | 'defender' | 'level' | 'fairFight'>('weightedRespect')
+const sortKey = ref<'wins' | 'losses' | 'stalemates' | 'weightedRespect' | 'defender' | 'level' | 'fairFight' | 'result'>('weightedRespect')
 const sortDir = ref<'asc' | 'desc'>('desc')
 
 function setSort(key: typeof sortKey.value) {
