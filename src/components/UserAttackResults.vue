@@ -175,7 +175,7 @@ function exportCSV() {
                 <template v-else-if="col.key === 'wins'">{{ attack.wins }}</template>
                 <template v-else-if="col.key === 'losses'">{{ attack.losses }}</template>
                 <template v-else-if="col.key === 'stalemates'">{{ attack.stalemates }}</template>
-                <template v-else-if="col.key === 'result'">{{ attack.result }}</template>
+                <template v-else-if="col.key === 'result'"><a :href="`https://www.torn.com/loader.php?sid=attackLog&ID=${attack.id}`" target="_log">{{ attack.result }}</a></template>
                 <template v-else>{{ (attack as any)[col.key] }}</template>
               </td>
             </tr>

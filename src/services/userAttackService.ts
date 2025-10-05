@@ -15,7 +15,7 @@ export async function getUserAttacks(
   const userAttacks = await tornApi.getUserAttacks(count)
   const weighted = userAttacks
     .map((x) => ({
-      id: x.id,
+      id: x.code,
       fairFight: x.modifiers.fair_fight,
       weightedRespect:
         x.respect_gain /
@@ -93,7 +93,7 @@ export async function getUserAttacks(
 }
 
 export interface WeightedUserAttack {
-  id: number
+  id: string
   weightedRespect: number
   fairFight: number
   wins: number
