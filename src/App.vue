@@ -63,8 +63,6 @@ watch(
     }
   },
 )
-
-
 </script>
 
 <template>

@@ -1,10 +1,13 @@
 import { TornApi } from './tornApiService'
 
-export async function getUserAttacks(apiKey: string, count: number) {
+const winTypes = ['Attacked', 'Hospitalized', 'Mugged']
+const lostType = 'Lost'
+const stalemateType = 'Stalemate'
+
+export async function getUserAttacks(apiKey: string, count: number): Promise<WeightedUserAttack[]> {
   const tornApi = new TornApi(apiKey)
   const userAttacks = await tornApi.getUserAttacks(count)
   const weighted = userAttacks
-    .filter((x) => x.respect_gain > 0)
     .map((x) => ({
       id: x.id,
       fairFight: x.modifiers.fair_fight,
@@ -24,7 +27,11 @@ export async function getUserAttacks(apiKey: string, count: number) {
   const groups = new Map<
     number,
     {
-      count: number
+      results: {
+        wins: number
+        losses: number
+        stalemates: number
+      }
       record: (typeof weighted)[number]
     }
   >()
@@ -32,11 +39,29 @@ export async function getUserAttacks(apiKey: string, count: number) {
   for (const rec of weighted) {
     const defId = rec.defender?.id
     if (defId == null) continue
+
+    const win = winTypes.indexOf(rec.result) >= 0
+    const loss = rec.result === lostType
+    const stalemate = rec.result === stalemateType
+
     const existing = groups.get(defId)
     if (!existing) {
-      groups.set(defId, { count: 1, record: rec })
+      groups.set(defId, {
+        results: {
+          wins: win ? 1 : 0,
+          losses: loss ? 1 : 0,
+          stalemates: stalemate ? 1 : 0,
+        },
+        record: rec,
+      })
     } else {
-      existing.count += 1
+      if (win) {
+        existing.results.wins++
+      } else if (loss) {
+        existing.results.losses++
+      } else if (stalemate) {
+        existing.results.stalemates++
+      }
       if (rec.weightedRespect > existing.record.weightedRespect) {
         existing.record = rec
       }
@@ -45,20 +70,21 @@ export async function getUserAttacks(apiKey: string, count: number) {
 
   const grouped = Array.from(groups.values()).map((g) => ({
     ...g.record,
-    count: g.count,
+    ...g.results,
   }))
 
-  // Sort groups by weightedRespect desc
-  grouped.sort((a, b) => b.weightedRespect - a.weightedRespect)
-
   return grouped
+    .filter((x) => x.wins > 0 && x.weightedRespect > 0)
+    .sort((a, b) => b.weightedRespect - a.weightedRespect)
 }
 
 export interface WeightedUserAttack {
   id: number
   weightedRespect: number
   fairFight: number
-  count: number
+  wins: number
+  losses: number
+  stalemates: number
   result: string
   defender: {
     id: number
