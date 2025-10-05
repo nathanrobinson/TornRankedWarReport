@@ -4,7 +4,13 @@ const winTypes = ['Attacked', 'Hospitalized', 'Mugged']
 const lostType = 'Lost'
 const stalemateType = 'Stalemate'
 
-export async function getUserAttacks(apiKey: string, count: number): Promise<WeightedUserAttack[]> {
+export async function getUserAttacks(
+  apiKey: string,
+  count: number,
+): Promise<{
+  totals: { [result: string]: number }
+  attacks: WeightedUserAttack[]
+}> {
   const tornApi = new TornApi(apiKey)
   const userAttacks = await tornApi.getUserAttacks(count)
   const weighted = userAttacks
@@ -23,6 +29,12 @@ export async function getUserAttacks(apiKey: string, count: number): Promise<Wei
       result: x.result,
     }))
     .sort((a, b) => b.defender.id - a.defender.id)
+
+  const totals = weighted.reduce((acc: { [result: string]: number }, x) => {
+    acc[x.result] = (acc[x.result] ?? 0) + 1
+
+    return acc
+  }, {})
 
   const groups = new Map<
     number,
@@ -73,9 +85,11 @@ export async function getUserAttacks(apiKey: string, count: number): Promise<Wei
     ...g.results,
   }))
 
-  return grouped
+  const attacks = grouped
     .filter((x) => x.wins > 0 && x.weightedRespect > 0)
     .sort((a, b) => b.weightedRespect - a.weightedRespect)
+
+  return { totals, attacks }
 }
 
 export interface WeightedUserAttack {
