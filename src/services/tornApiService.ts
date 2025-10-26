@@ -274,6 +274,41 @@ export class TornApi {
 
     return attacks
   }
+
+  public async getMugs(count: number = 100) {
+    count = Number(count)
+    if (isNaN(count) || count <= 0) {
+      count = 100
+    }
+
+    const pageSize = count > 100 ? 100 : count
+
+    let attackReport = await this.#fetch<UserLogReport>('user/log', {
+      log: 8155,
+      limit: pageSize,
+      sort: 'DESC',
+    })
+
+    const attacks: UserLogItem[] = attackReport.log
+    let total = attacks.length
+
+    while (total < count && attackReport._metadata.links.prev) {
+      const next = count - total
+      let nextUrl = attackReport._metadata.links.prev
+
+      if (next < pageSize) {
+        nextUrl = nextUrl.replace('limit=100', `limit=${next}`)
+      }
+
+      attackReport = await this.#fetchExact<UserLogReport>(nextUrl)
+
+      total += attackReport.log.length
+
+      attacks.push(...attackReport.log)
+    }
+
+    return attacks
+  }
 }
 
 interface FactionInfo {
@@ -369,6 +404,13 @@ interface PlayerChainReport {
   chainBuilds: number
 }
 
+interface Metadata {
+  links: {
+    prev: string
+    next: string
+  }
+}
+
 interface Chains {
   chains: {
     id: number
@@ -377,12 +419,7 @@ interface Chains {
     start: number
     end: number
   }[]
-  _metadata: {
-    links: {
-      prev: string
-      next: string
-    }
-  }
+  _metadata: Metadata
 }
 
 interface ChainReportWrapper {
@@ -460,12 +497,7 @@ interface AttackLog {
     respect_gain: number
     respect_loss: number
   }[]
-  _metadata: {
-    links: {
-      next: string
-      prev: string
-    }
-  }
+  _metadata: Metadata
 }
 
 interface ReviveLog {
@@ -487,22 +519,12 @@ interface ReviveLog {
     result: string
     timestamp: number
   }[]
-  _metadata: {
-    links: {
-      next: string
-      prev: string
-    }
-  }
+  _metadata: Metadata
 }
 
 interface UserAttacksReport {
   attacks: UserAttack[]
-  _metadata: {
-    links: {
-      next: string
-      prev: string
-    }
-  }
+  _metadata: Metadata
 }
 
 interface UserAttack {
@@ -551,4 +573,29 @@ interface UserAttack {
     chain: number
     warlord: number
   }
+}
+
+interface UserLogItem {
+  id: string
+  timestamp: number
+  details: {
+    id: number
+    title: string
+    category: string
+  }
+  data: {
+    defender: number
+    anonymous: number
+    energy_used: number
+    money_mugged: number
+    attackers: number
+    chain: number
+    log: string
+  }
+  params: unknown
+}
+
+interface UserLogReport {
+  log: UserLogItem[]
+  _metadata: Metadata
 }

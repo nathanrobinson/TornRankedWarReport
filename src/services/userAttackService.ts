@@ -92,6 +92,53 @@ export async function getUserAttacks(
   return { totals, attacks }
 }
 
+export async function getMugs(
+  apiKey: string,
+  count: number,
+): Promise<{
+  totals: { mugs: number; totalMugged: number }
+  attacks: UserMug[]
+}> {
+  const tornApi = new TornApi(apiKey)
+  const userAttacks = await tornApi.getMugs(count)
+  const totals = userAttacks.reduce(
+    (previous, current) => ({
+      mugs: previous.mugs + 1,
+      totalMugged: previous.totalMugged + current.data.money_mugged,
+    }),
+    { mugs: 0, totalMugged: 0 },
+  )
+
+  const groups = new Map<number, UserMug>()
+
+  userAttacks.map((x) => {
+    const userAttack: UserMug = {
+      defender: x.data.defender,
+      timestamp: x.timestamp,
+      amount: x.data.money_mugged,
+      timesMugged: 1,
+      link: x.data.log,
+    }
+
+    const existing = groups.get(userAttack.defender)
+
+    if (existing) {
+      if (existing.timestamp > userAttack.timestamp) {
+        existing.timesMugged++
+        return
+      } else {
+        userAttack.timesMugged += existing.timesMugged
+      }
+    }
+
+    groups.set(userAttack.defender, userAttack)
+  })
+
+  const attacks = Array.from(groups.values())
+
+  return { totals, attacks }
+}
+
 export interface WeightedUserAttack {
   id: string
   weightedRespect: number
@@ -109,4 +156,12 @@ export interface WeightedUserAttack {
       name: string
     }
   }
+}
+
+export interface UserMug {
+  defender: number
+  timestamp: number
+  amount: number
+  timesMugged: number
+  link: string
 }

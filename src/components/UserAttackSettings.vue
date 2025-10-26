@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const emit = defineEmits<{ (e: 'search', payload: { apiKey: string; numAttacks: number }): void }>()
+const emit = defineEmits<{ (e: 'search', payload: { apiKey: string; numAttacks: number, showMugReport: boolean }): void }>()
 
 const apiKey = ref('')
 const numAttacks = ref(100)
+const showMugReport = ref(false)
 
 function handleSubmit() {
   if (apiKey.value && !props.loading) {
-    emit('search', { apiKey: apiKey.value, numAttacks: numAttacks.value })
+    emit('search', { apiKey: apiKey.value, numAttacks: numAttacks.value, showMugReport: showMugReport.value })
   }
 }
 
@@ -17,6 +18,8 @@ const helpOpen = ref<string | null>(null)
 const helpTexts: Record<string, string> = {
   apiKey:
     'Your Torn API key with at least limited access. This is required to fetch attack data. The key is not saved or transmitted anywhere except to the torn api.',
+  showMugReport:
+    'Shows money mugged. You Torn API key must have Private access.'
 }
 
 function showHelp(key: string) {
@@ -54,6 +57,28 @@ const props = defineProps<{
 
     <label for="uh-numAttacks">Number of attacks:</label>
     <input id="uh-numAttacks" v-model.number="numAttacks" type="number" min="1" />
+
+      <label>
+        <input type="checkbox" v-model="showMugReport" />
+        <span class="label"
+          >Show mug report
+          <span
+            class="help-icon"
+            @mouseenter="showHelp('showMugReport')"
+            @mouseleave="hideHelp('showMugReport')"
+            @click="
+              helpOpen === 'showMugReport'
+                ? hideHelp('showMugReport')
+                : showHelp('showMugReport')
+            "
+            tabindex="0"
+            >?</span
+          ></span
+        >
+        <span v-if="helpOpen === 'showMugReport'" class="help-popup">{{
+          helpTexts.showMugReport
+        }}</span>
+      </label>
 
     <button type="submit" :disabled="props.loading">
       <span v-if="props.loading" class="spinner" aria-label="Loading"></span>

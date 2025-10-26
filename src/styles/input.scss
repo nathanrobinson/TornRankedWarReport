@@ -10,6 +10,35 @@ select {
   width: 100%;
 }
 
+select,
+input[type='checkbox'],
+input[type='radio'] {
+  appearance: none;
+  -webkit-appearance: none; /* For older WebKit browsers */
+  -moz-appearance: none; /* For older Firefox browsers */
+}
+
+input[type='checkbox'] {
+  margin-right: 8px;
+  padding: 10px 8px;
+  width: 45px;
+  height: 45px;
+}
+
+input[type='checkbox']::after {
+  content: '　';
+  position: relative;
+  display: inline-block;
+  color: #2d3047;
+  font-size: 31px;
+  text-align: center;
+  line-height: 20px;
+  font-weight: bold;
+}
+input[type='checkbox']:checked:after {
+  content: '✓';
+}
+
 input,
 select {
   box-sizing: border-box;

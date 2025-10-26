@@ -294,6 +294,7 @@ const props = defineProps<{
 <style lang="scss" scoped>
 @use 'sass:color';
 @use '@/styles/variables';
+@use '@/styles/input';
 
 form {
   background: variables.$form-bg;
@@ -326,14 +327,6 @@ label > a.small {
   margin-left: 8px;
   text-decoration: none;
   display: inline-block;
-}
-
-select,
-input[type='checkbox'],
-input[type='radio'] {
-  appearance: none;
-  -webkit-appearance: none; /* For older WebKit browsers */
-  -moz-appearance: none; /* For older Firefox browsers */
 }
 
 .select-wrapper {
@@ -379,27 +372,6 @@ select {
     border-color: variables.$accent;
     outline: 0;
   }
-}
-
-input[type='checkbox'] {
-  margin-right: 8px;
-  padding: 10px 8px;
-  width: 45px;
-  height: 45px;
-}
-
-input[type='checkbox']::after {
-  content: '　';
-  position: relative;
-  display: inline-block;
-  color: #2d3047;
-  font-size: 31px;
-  text-align: center;
-  line-height: 20px;
-  font-weight: bold;
-}
-input[type='checkbox']:checked:after {
-  content: '✓';
 }
 span.label {
   margin-top: -2px;
