@@ -19,7 +19,7 @@ const helpTexts: Record<string, string> = {
   apiKey:
     'Your Torn API key with at least limited access. This is required to fetch attack data. The key is not saved or transmitted anywhere except to the torn api.',
   showMugReport:
-    'Shows money mugged. You Torn API key must have Private access.'
+    'Shows money mugged. You Torn API key must be Full Access.'
 }
 
 function showHelp(key: string) {
