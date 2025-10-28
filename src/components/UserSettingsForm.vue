@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { RewardSettings } from '@/models/rewardSettings'
+
+const localStorageEnabledKey = 'UserAttackReport_SaveKey_Enabled'
+const localStorageApiKeyKey = 'UserAttackReport_ApiKey'
 
 const apiKey = ref('')
 const attackRewards = ref('')
@@ -14,6 +17,26 @@ const minMedOuts = ref('10')
 const payoutType = ref<'perAttack' | 'perRespect'>('perRespect')
 const ignoreChainBonus = ref(true)
 const includeChainBuilders = ref(false)
+const saveApiKey = ref(false)
+
+function saveApiKeyToLocalStorage() {
+  localStorage.setItem(localStorageEnabledKey, 'true');
+  const encoded = btoa(apiKey.value)
+  localStorage.setItem(localStorageApiKeyKey, encoded);
+}
+function clearApiKeyFromLocalStorage() {
+  localStorage.setItem(localStorageEnabledKey, 'false');
+  localStorage.setItem(localStorageApiKeyKey, '');
+}
+function readApiKeyFromLocalStorage() {
+  saveApiKey.value = localStorage.getItem(localStorageEnabledKey) === 'true';
+  if (saveApiKey.value) {
+    const encoded = localStorage.getItem(localStorageApiKeyKey);
+    if (encoded) {
+      apiKey.value = atob(encoded);
+    }
+  }
+}
 
 function parseNumber(value: string): number {
   const normalized = String(value).replace(/[^0-9]/g, '')
@@ -30,6 +53,11 @@ const includeChainBuildersEnabled = computed(() => payoutType.value === 'perAtta
 
 function handleSubmit() {
   if (apiKey.value && !props.loading) {
+    if (saveApiKey.value) {
+      saveApiKeyToLocalStorage();
+    } else {
+      clearApiKeyFromLocalStorage();
+    }
     emit('submit', {
       apiKey: apiKey.value,
       attackRewards: parseNumber(attackRewards.value),
@@ -64,6 +92,7 @@ const helpTexts: Record<string, string> = {
     'If checked, attacks with a special chain bonus will be calculated at 10 respect instead of the bonus amount.',
   includeChainBuilders:
     'If checked, attacks that are part of a chain but do not contribute respect to the war will be included in payouts. This should not be checked if you are using the Chain Builder Rewards for a separate payout pool or if you only want to include War hits.',
+    saveApiKey: 'Save your API Key to local storage. Your key will only be saved in this browser\'s storage. Do not check if on a public/shared computer',
 }
 
 function showHelp(key: string) {
@@ -76,6 +105,8 @@ function hideHelp(key: string) {
 const props = defineProps<{
   loading?: boolean
 }>()
+
+onMounted(() => readApiKeyFromLocalStorage())
 </script>
 
 <template>
@@ -100,6 +131,27 @@ const props = defineProps<{
         >
       </label>
       <input id="apiKey" v-model="apiKey" type="password" required />
+      <label>
+        <input type="checkbox" v-model="saveApiKey" />
+        <span class="label"
+          >Save locally
+          <span
+            class="help-icon"
+            @mouseenter="showHelp('saveApiKey')"
+            @mouseleave="hideHelp('saveApiKey')"
+            @click="
+              helpOpen === 'saveApiKey'
+                ? hideHelp('saveApiKey')
+                : showHelp('saveApiKey')
+            "
+            tabindex="0"
+            >?</span
+          ></span
+        >
+        <span v-if="helpOpen === 'saveApiKey'" class="help-popup">{{
+          helpTexts.saveApiKey
+        }}</span>
+      </label>
     </div>
     <div>
       <label for="attackRewards">

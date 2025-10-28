@@ -1,15 +1,43 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+
+const localStorageEnabledKey = 'RankedWarReport_SaveKey_Enabled'
+const localStorageApiKeyKey = 'RankedWarReport_ApiKey'
 
 const emit = defineEmits<{ (e: 'search', payload: { apiKey: string; numAttacks: number, showMugReport: boolean }): void }>()
 
 const apiKey = ref('')
 const numAttacks = ref(100)
 const showMugReport = ref(false)
+const saveApiKey = ref(false)
 
 function handleSubmit() {
   if (apiKey.value && !props.loading) {
+    if (saveApiKey.value) {
+      saveApiKeyToLocalStorage();
+    } else {
+      clearApiKeyFromLocalStorage();
+    }
     emit('search', { apiKey: apiKey.value, numAttacks: numAttacks.value, showMugReport: showMugReport.value })
+  }
+}
+
+function saveApiKeyToLocalStorage() {
+  localStorage.setItem(localStorageEnabledKey, 'true');
+  const encoded = btoa(apiKey.value)
+  localStorage.setItem(localStorageApiKeyKey, encoded);
+}
+function clearApiKeyFromLocalStorage() {
+  localStorage.setItem(localStorageEnabledKey, 'false');
+  localStorage.setItem(localStorageApiKeyKey, '');
+}
+function readApiKeyFromLocalStorage() {
+  saveApiKey.value = localStorage.getItem(localStorageEnabledKey) === 'true';
+  if (saveApiKey.value) {
+    const encoded = localStorage.getItem(localStorageApiKeyKey);
+    if (encoded) {
+      apiKey.value = atob(encoded);
+    }
   }
 }
 
@@ -19,7 +47,8 @@ const helpTexts: Record<string, string> = {
   apiKey:
     'Your Torn API key with at least limited access. This is required to fetch attack data. The key is not saved or transmitted anywhere except to the torn api.',
   showMugReport:
-    'Shows money mugged. You Torn API key must be Full Access.'
+    'Shows money mugged. You Torn API key must be Full Access.',
+  saveApiKey: 'Save your API Key to local storage. Your key will only be saved in this browser\'s storage. Do not check if on a public/shared computer',
 }
 
 function showHelp(key: string) {
@@ -32,6 +61,8 @@ function hideHelp(key: string) {
 const props = defineProps<{
   loading?: boolean
 }>()
+
+onMounted(() => readApiKeyFromLocalStorage())
 </script>
 
 <template>
@@ -54,6 +85,28 @@ const props = defineProps<{
         >
       </label>
     <input id="uh-apiKey" v-model="apiKey" type="password" placeholder="Enter API key" />
+
+      <label>
+        <input type="checkbox" v-model="saveApiKey" />
+        <span class="label"
+          >Save locally
+          <span
+            class="help-icon"
+            @mouseenter="showHelp('saveApiKey')"
+            @mouseleave="hideHelp('saveApiKey')"
+            @click="
+              helpOpen === 'saveApiKey'
+                ? hideHelp('saveApiKey')
+                : showHelp('saveApiKey')
+            "
+            tabindex="0"
+            >?</span
+          ></span
+        >
+        <span v-if="helpOpen === 'saveApiKey'" class="help-popup">{{
+          helpTexts.saveApiKey
+        }}</span>
+      </label>
 
     <label for="uh-numAttacks">Number of attacks:</label>
     <input id="uh-numAttacks" v-model.number="numAttacks" type="number" min="1" />
