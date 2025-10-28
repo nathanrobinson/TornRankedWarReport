@@ -143,7 +143,7 @@ function timeAgo(unixTimestamp: number) {
   }
 }
 
-function formatAmount(amount: number) {
+function formatCurrency(amount: number) {
   const formatter = new Intl.NumberFormat(undefined, {
     style: 'currency',
     currency: 'USD',
@@ -202,7 +202,7 @@ function getMugTimeClass(attack: UserMug) {
 
       <div v-if="props.totals" class="totals">
         <div class="total-card">Total Attacks: {{ props.totals.mugs }}</div>
-        <div class="total-card">Total Mugged: {{ props.totals.totalMugged }}</div>
+        <div class="total-card">Total Mugged: {{ formatCurrency(props.totals.totalMugged) }}</div>
       </div>
 
       <div class="controls">
@@ -237,7 +237,7 @@ function getMugTimeClass(attack: UserMug) {
                   <a :href="`https://www.torn.com/loader.php?sid=attack&user2ID=${attack.defender}`" target="_attack">⚔️</a>
                 </template>
                 <template v-else-if="col.key === 'timestamp'">{{ formatUnixTimestampToLocalDate(attack.timestamp) }} ({{ timeAgo(attack.timestamp) }})</template>
-                <template v-else-if="col.key === 'amount'">{{ formatAmount(attack.amount) }}</template>
+                <template v-else-if="col.key === 'amount'">{{ formatCurrency(attack.amount) }}</template>
                 <template v-else-if="col.key === 'timesMugged'">{{ attack.timesMugged }}</template>
                 <template v-else-if="col.key === 'link'"><a :href="formatLink(attack.link)" target="_log">view</a></template>
                 <template v-else>{{ (attack as any)[col.key] }}</template>
